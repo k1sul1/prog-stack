@@ -120,7 +120,10 @@ Prior to your first deployment, you'll need to do a few things:
   fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app remix-prog-stack
   fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app remix-prog-stack-staging
 
+  fly secrets set HASURA_URL="https://remix-prog-hasura.fly.dev/v1/graphql" --app remix-prog-stack
+  # fly secrets set HASURA_URL="http://remix-prog-hasura.internal/v1/graphql" --app remix-prog-stack
 
+  fly secrets set HASURA_ADMIN_SECRET="hunter1" --app remix-prog-stack
   ```
 
   > **Note:** When creating the staging secret, you may get a warning from the Fly CLI that looks like this:
