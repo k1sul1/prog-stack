@@ -38,16 +38,15 @@ Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --
 - Start [Docker services](https://www.docker.com/get-started):
 
   ```sh
+  cd hasura
+
   docker compose up [-d] # -d if you don't care about logs
+  hasura console # To open up the console / db client.
   ```
 
   > **Note:** The npm script will complete while Docker sets up the container in the background. Ensure that Docker has finished and your container is running before proceeding.
 
-- Initial setup:
-
-  ```sh
-  npm run setup
-  ```
+  > **Additional note:**This stack is setup a bit differently than Blues. Remix is one Fly application, Hasura is another. The database is attached to Hasura. If you wanted to, you could connect to the database from Remix, but then you'd be better of using Prisma in the first place.
 
 - Run the first build:
 
@@ -122,10 +121,6 @@ Prior to your first deployment, you'll need to do a few things:
   fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app remix-prog-stack-staging
 
 
-  fly secrets set HASURA_GRAPHQL_DATABASE_URL="postgres://postgres:postgres@localhost:5432/postgres" --app remix-prog-stack
-  fly secrets set HASURA_GRAPHQL_ADMIN_SECRET="OurAdminSecret" --app remix-prog-stack
-  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app remix-prog-stack
-
   ```
 
   > **Note:** When creating the staging secret, you may get a warning from the Fly CLI that looks like this:
@@ -138,19 +133,21 @@ Prior to your first deployment, you'll need to do a few things:
 
   If you don't have openssl installed, you can also use [1password](https://1password.com/password-generator/) to generate a random secret, just replace `$(openssl rand -hex 32)` with the generated secret.
 
-- Create a database for both your staging and production environments. Run the following:
+- ~~Create a database for both your staging and production environments. Run the following~~:
 
   ```sh
-  fly postgres create --name remix-prog-stack-db
-  fly postgres attach --postgres-app remix-prog-stack-db --app remix-prog-stack
+  # fly postgres create --name remix-prog-stack-db
+  # fly postgres attach --postgres-app remix-prog-stack-db --app remix-prog-stack
 
-  fly postgres create --name remix-prog-stack-staging-db
-  fly postgres attach --postgres-app remix-prog-stack-staging-db --app remix-prog-stack-staging
+  # fly postgres create --name remix-prog-stack-staging-db
+  # fly postgres attach --postgres-app remix-prog-stack-staging-db --app # remix-prog-stack-staging
   ```
 
   > **Note:** You'll get the same warning for the same reason when attaching the staging database that you did in the `fly set secret` step above. No worries. Proceed!
 
-Fly will take care of setting the `DATABASE_URL` secret for you.
+  > **Note #2:** Blues stack attached the database to the Remix application. The smart way to run Hasura is to run it as another app / container, which is what has been done here. Navigate to /hasura folder for instructions what to do instead.
+
+~~Fly will take care of setting the `DATABASE_URL` secret for you.~~ While Fly does set DATABASE_URL for us, that isn't much help when Hasura expects HASURA_GRAPHQL_DATABASE_URL.
 
 Now that everything is set up you can commit and push your changes to your repo. Every commit to your `main` branch will trigger a deployment to your production environment, and every commit to your `dev` branch will trigger a deployment to your staging environment.
 

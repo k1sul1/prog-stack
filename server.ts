@@ -17,13 +17,12 @@ declare global {
 }
 
 const app = express();
-const defDbUrl = "postgres://postgres:postgres@postgres:5432/postgres";
 const defSecret = "keyboardcat";
 
-process.env.DATABASE_URL = process.env.DATABASE_URL || defDbUrl;
 process.env.SESSION_SECRET = process.env.SESSION_SECRET || defSecret;
-process.env.HASURA_URL = process.env.HASURA_URL || "";
-process.env.HASURA_ADMIN_SECRET = process.env.HASURA_ADMIN_SECRET || "";
+process.env.HASURA_URL =
+  process.env.HASURA_URL || "http://localhost:8080/v1/graphql";
+process.env.HASURA_ADMIN_SECRET = process.env.HASURA_ADMIN_SECRET || "hunter1";
 
 if (process.env.SESSION_SECRET === defSecret) {
   console.error(`
