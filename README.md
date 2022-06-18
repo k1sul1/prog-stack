@@ -1,5 +1,9 @@
 # Remix Prog Stack
 
+# WORK IN PROGRESS
+
+README and other documents may not reflect reality. Hasura doesn't deploy to Fly yet.
+
 [Motivation behind the stack](https://www.youtube.com/watch?v=ZNIV2H-jmfM)
 
 Learn more about [Remix Stacks](https://remix.run/stacks).
