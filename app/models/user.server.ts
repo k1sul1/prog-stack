@@ -1,15 +1,5 @@
-import bcrypt, { hash } from "bcryptjs";
+import bcrypt from "bcryptjs";
 import gqlReq, { gql } from "~/server/gql.server";
-
-const userObjectSkeleton = {
-  uuid: "123",
-  fname: "Someone",
-  lname: "Name",
-  email: "someone@example.com",
-  role: 0,
-  status: 1,
-  meta: null,
-};
 
 export type User = {
   uuid: string;
@@ -21,15 +11,38 @@ export type User = {
   meta: JSON | null;
 };
 export type UserWithPassword = User & { passhash: string };
+
 export enum UserRole {
   Owner = 0,
   Admin = 1,
   User = 2,
 }
+
 export enum UserStatus {
   Unconfirmed = 0,
   Confirmed = 1,
   Banned = 2,
+}
+
+export async function getAllUsers() {
+  const { users } = await gqlReq<{ users: User[] }>(
+    gql`
+      query getAllUsers($uuid: uuid) {
+        users {
+          uuid
+          fname
+          lname
+          email
+          role
+          status
+          meta
+        }
+      }
+    `,
+    {}
+  );
+
+  return users;
 }
 
 export async function getUserByUUID(uuid: User["uuid"]) {

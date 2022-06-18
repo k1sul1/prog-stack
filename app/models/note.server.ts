@@ -1,22 +1,6 @@
-// import type { User, Note } from "@prisma/client";
-
-// import { prisma } from "~/server/db.server";
-
-// export type { Note } from "@prisma/client";
-
 import { User } from "./user.server";
 import gqlReq, { gql } from "~/server/gql.server";
 
-const note = {
-  uuid: "123",
-  title: "Title",
-  body: "Lorem ipsum",
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-  user: "123",
-};
-
-// export type Note = typeof note;
 export type Note = {
   uuid: string;
   title: string;
@@ -53,9 +37,6 @@ export async function getNote({
   }
 
   return notes[0];
-  // return prisma.note.findFirst({
-  //   where: { id, userId },
-  // });
 }
 
 export async function getNoteListItems({
@@ -112,27 +93,7 @@ export async function createNote({
   );
 
   return note;
-  // return prisma.note.create({
-  //   data: {
-  //     title,
-  //     body,
-  //     user: {
-  //       connect: {
-  //         id: userId,
-  //       },
-  //     },
-  //   },
-  // });
 }
-
-// export function deleteNote({
-//   uuid,
-//   userId,
-// }: Pick<Note, "uuid"> & { userId: User["uuid"] }) {
-//   // return prisma.note.deleteMany({
-//   //   where: { id, userId },
-//   // });
-// }
 
 export async function deleteNote(uuid: string) {
   const { delete_notes_by_pk: deletedNotes } = await gqlReq<{
