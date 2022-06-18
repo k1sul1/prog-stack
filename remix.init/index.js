@@ -21,7 +21,7 @@ async function main({ rootDirectory }) {
   const ENV_PATH = path.join(rootDirectory, ".env");
   const PACKAGE_JSON_PATH = path.join(rootDirectory, "package.json");
 
-  const REPLACER = "blues-stack-template";
+  const REPLACER = "remix-prog-stack";
 
   const DIR_NAME = path.basename(rootDirectory);
   const SUFFIX = getRandomString(2);
@@ -76,11 +76,10 @@ async function main({ rootDirectory }) {
     `
 Setup is almost complete. Follow these steps to finish initialization:
 
-- Start the database:
-  npm run docker
+- Install hasura cli if you didn't already
 
-- Run setup (this updates the database):
-  npm run setup
+- Start the database:
+  docker-compose up
 
 - Run the first build (this generates the server you will run):
   npm run build

@@ -1,21 +1,22 @@
-# Remix Blues Stack
+# Remix Prog Stack
 
-![The Remix Blues Stack](https://repository-images.githubusercontent.com/461012689/37d5bd8b-fa9c-4ab0-893c-f0a199d5012d)
+[Motivation behind the stack](https://www.youtube.com/watch?v=ZNIV2H-jmfM)
 
 Learn more about [Remix Stacks](https://remix.run/stacks).
 
 ```
-npx create-remix --template remix-run/blues-stack
+npx create-remix --template k1sul1/prog-stack
 ```
 
 ## What's in the stack
+
+Everything that [the Blues stack](https://github.com/remix-run/blues-stack) had when this stack was forked from it on 2022-06-17, and a tad more.
 
 - [Multi-region Fly app deployment](https://fly.io/docs/reference/scaling/) with [Docker](https://www.docker.com/)
 - [Multi-region Fly PostgreSQL Cluster](https://fly.io/docs/getting-started/multi-region-databases/)
 - Healthcheck endpoint for [Fly backups region fallbacks](https://fly.io/docs/reference/configuration/#services-http_checks)
 - [GitHub Actions](https://github.com/features/actions) for deploy on merge to production and staging environments
 - Email/Password Authentication with [cookie-based sessions](https://remix.run/docs/en/v1/api/remix#createcookiesessionstorage)
-- Database ORM with [Prisma](https://prisma.io)
 - Styling with [Tailwind](https://tailwindcss.com/)
 - End-to-end testing with [Cypress](https://cypress.io)
 - Local third party request mocking with [MSW](https://mswjs.io)
@@ -26,18 +27,14 @@ npx create-remix --template remix-run/blues-stack
 
 Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --template your/repo`! Make it your own.
 
-## Quickstart
-
-Click this button to create a [Gitpod](https://gitpod.io) workspace with the project set up, Postgres started, and Fly pre-installed
-
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/from-referrer/)
-
 ## Development
 
-- Start the Postgres Database in [Docker](https://www.docker.com/get-started):
+- Install [Hasura CLI](https://hasura.io/docs/latest/graphql/core/hasura-cli/install-hasura-cli/). It's available on npm.
+
+- Start [Docker services](https://www.docker.com/get-started):
 
   ```sh
-  npm run docker
+  docker compose up [-d] # -d if you don't care about logs
   ```
 
   > **Note:** The npm script will complete while Docker sets up the container in the background. Ensure that Docker has finished and your container is running before proceeding.
@@ -71,10 +68,10 @@ If you'd prefer not to use Docker, you can also use Fly's Wireguard VPN to conne
 
 ### Relevant code:
 
-This is a pretty simple note-taking app, but it's a good example of how you can build a full stack app with Prisma and Remix. The main functionality is creating users, logging in and out, and creating and deleting notes.
+This is a pretty simple note-taking app, but it's a good example of how you can build a full stack app with Hasura and Remix. The main functionality is creating users, logging in and out, and creating and deleting notes.
 
 - creating users, and logging in and out [./app/models/user.server.ts](./app/models/user.server.ts)
-- user sessions, and verifying them [./app/session.server.ts](./app/session.server.ts)
+- user sessions, and verifying them [./app/session.server.ts](app/server/session.server.ts)
 - creating, and deleting notes [./app/models/note.server.ts](./app/models/note.server.ts)
 
 ## Deployment
@@ -96,8 +93,8 @@ Prior to your first deployment, you'll need to do a few things:
 - Create two apps on Fly, one for staging and one for production:
 
   ```sh
-  fly create blues-stack-template
-  fly create blues-stack-template-staging
+  fly create remix-prog-stack
+  fly create remix-prog-stack-staging
   ```
 
 - Initialize Git.
@@ -117,14 +114,20 @@ Prior to your first deployment, you'll need to do a few things:
 - Add a `SESSION_SECRET` to your fly app secrets, to do this you can run the following commands:
 
   ```sh
-  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app blues-stack-template
-  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app blues-stack-template-staging
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app remix-prog-stack
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app remix-prog-stack-staging
+
+
+  fly secrets set HASURA_GRAPHQL_DATABASE_URL="postgres://postgres:postgres@localhost:5432/postgres" --app remix-prog-stack
+  fly secrets set HASURA_GRAPHQL_ADMIN_SECRET="OurAdminSecret" --app remix-prog-stack
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app remix-prog-stack
+
   ```
 
   > **Note:** When creating the staging secret, you may get a warning from the Fly CLI that looks like this:
   >
   > ```
-  > WARN app flag 'blues-stack-template-staging' does not match app name in config file 'blues-stack-template'
+  > WARN app flag 'remix-prog-stack-staging' does not match app name in config file 'remix-prog-stack'
   > ```
   >
   > This simply means that the current directory contains a config that references the production app we created in the first step. Ignore this warning and proceed to create the secret.
@@ -134,11 +137,11 @@ Prior to your first deployment, you'll need to do a few things:
 - Create a database for both your staging and production environments. Run the following:
 
   ```sh
-  fly postgres create --name blues-stack-template-db
-  fly postgres attach --postgres-app blues-stack-template-db --app blues-stack-template
+  fly postgres create --name remix-prog-stack-db
+  fly postgres attach --postgres-app remix-prog-stack-db --app remix-prog-stack
 
-  fly postgres create --name blues-stack-template-staging-db
-  fly postgres attach --postgres-app blues-stack-template-staging-db --app blues-stack-template-staging
+  fly postgres create --name remix-prog-stack-staging-db
+  fly postgres attach --postgres-app remix-prog-stack-staging-db --app remix-prog-stack-staging
   ```
 
   > **Note:** You'll get the same warning for the same reason when attaching the staging database that you did in the `fly set secret` step above. No worries. Proceed!
