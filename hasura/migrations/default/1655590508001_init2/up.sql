@@ -1,3 +1,4 @@
+
 SET check_function_bodies = false;
 CREATE FUNCTION public."set_current_timestamp_updatedAt"() RETURNS trigger
     LANGUAGE plpgsql
@@ -38,3 +39,11 @@ CREATE TRIGGER "set_public_notes_updatedAt" BEFORE UPDATE ON public.notes FOR EA
 COMMENT ON TRIGGER "set_public_notes_updatedAt" ON public.notes IS 'trigger to set value of column "updatedAt" to current timestamp on row update';
 ALTER TABLE ONLY public.notes
     ADD CONSTRAINT notes_user_fkey FOREIGN KEY ("user") REFERENCES public.users(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+CREATE TABLE "public"."Test" ("created_at" timestamptz NOT NULL DEFAULT now(), PRIMARY KEY ("created_at") );
+
+CREATE TABLE "public"."test2" ("id" serial NOT NULL, PRIMARY KEY ("id") );
+
+DROP table "public"."Test";
+
+DROP table "public"."test2";

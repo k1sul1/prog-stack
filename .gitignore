@@ -17,3 +17,4 @@ node_modules
 
 /app/styles/tailwind.css
 .DS_Store
+hasura/migrate.sh

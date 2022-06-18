@@ -1,0 +1,3 @@
+SET check_function_bodies = false;
+INSERT INTO public.users (uuid, fname, lname, email, passhash, role, status, meta) VALUES ('af3f9cec-85a4-4eb3-b58f-d1ba34ae4d11', 'Rachel', '@ Remix', 'rachel@remix.run', '$2a$10$Pp4kfhiiWTk4yNvk5tJoUOsclKpCts87J58R0hKpkA998NlpjsW9W', 0, 1, NULL);
+INSERT INTO public.notes (uuid, title, body, "createdAt", "updatedAt", "user") VALUES ('d5d792fd-48a8-4f38-a602-f06fd9ec9b27', 'Hasura is the greatest thing in tech in a long while', 'Turning DB schemas into GraphQL APIs automagically.', '2022-06-18 23:28:01.224475+00', '2022-06-18 23:28:01.224475+00', 'af3f9cec-85a4-4eb3-b58f-d1ba34ae4d11');

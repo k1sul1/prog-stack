@@ -1,25 +1,63 @@
 # Remix Prog Stack
 
-# WORK IN PROGRESS
-
-README and other documents may not reflect reality. Hasura doesn't deploy to Fly yet.
+```
+npx create-remix --template k1sul1/prog-stack
+```
 
 [Motivation behind the stack](https://www.youtube.com/watch?v=ZNIV2H-jmfM)
 
-Learn more about [Remix Stacks](https://remix.run/stacks).
+I like Hasura more than I like Prisma. There, I said it. While Remix has killed almost every client side api call, I like having a GraphQL API and the option to talk to it from the browser.
 
-```
-npx create-remix --template k1sul1/prog-stack
+This stack **does not** talk to Hasura from the browser, but you could make it do that if you wanted to, pretty easily.
+
+One of the differences between Prisma & Hasura, other than the fact that comparing them is a total apples & oranges comparison, is that there is no schema file that you maintain manually with Hasura. With Hasura, you manage the db schema through `hasura console`, and write something like this:
+
+```ts
+export type User = {
+  uuid: string;
+  fname: string;
+  lname: string;
+  email: string;
+  role: number;
+  status: number;
+  meta: JSON | null;
+};
+
+export async function getUserByEmail(email: User["email"]) {
+  const { users } = await gqlReq<{ users: User[] }>(
+    gql`
+      query getUserByEmail($email: String) {
+        users(where: { email: { _eq: $email } }) {
+          uuid
+          fname
+          lname
+          email
+          role
+          status
+          meta
+        }
+      }
+    `,
+    { email }
+  );
+
+  if (!users.length) {
+    return null;
+  }
+
+  return users[0];
+}
 ```
 
 ## What's in the stack
 
 Everything that [the Blues stack](https://github.com/remix-run/blues-stack) had when this stack was forked from it on 2022-06-17, and a tad more.
 
+- [Hasura](https://hasura.io/)
 - [Multi-region Fly app deployment](https://fly.io/docs/reference/scaling/) with [Docker](https://www.docker.com/)
 - [Multi-region Fly PostgreSQL Cluster](https://fly.io/docs/getting-started/multi-region-databases/)
 - Healthcheck endpoint for [Fly backups region fallbacks](https://fly.io/docs/reference/configuration/#services-http_checks)
-- [GitHub Actions](https://github.com/features/actions) for deploy on merge to production and staging environments
+- ~~[GitHub Actions](https://github.com/features/actions) for deploy on merge to production and staging environments~~ It's there, but it doesn't consider the existence of Hasura at the moment. It's probably simple to setup but I don't have time at the time of writing. If you do set it up, please create a pull request! I'm quite happy with running `fly deploy`.
 - Email/Password Authentication with [cookie-based sessions](https://remix.run/docs/en/v1/api/remix#createcookiesessionstorage)
 - Styling with [Tailwind](https://tailwindcss.com/)
 - End-to-end testing with [Cypress](https://cypress.io)
@@ -37,16 +75,22 @@ Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --
 
 - Start [Docker services](https://www.docker.com/get-started):
 
-  ```sh
-  cd hasura
+If you'd prefer not to use Docker, ~~you can also use Fly's Wireguard VPN to connect to a development database (or even your production database). You can find the instructions to set up Wireguard [here](https://fly.io/docs/reference/private-networking/#install-your-wireguard-app), and the instructions for creating a development database [here](https://fly.io/docs/reference/postgres/).~~ you can just point the local application to the Hasura instance you will deploy a bit later.
 
-  docker compose up [-d] # -d if you don't care about logs
-  hasura console # To open up the console / db client.
-  ```
+```sh
+cd hasura
 
-  > **Note:** The npm script will complete while Docker sets up the container in the background. Ensure that Docker has finished and your container is running before proceeding.
+docker compose up [-d] # -d if you don't care about logs
+hasura seed # To populate the database
+hasura console # To open up the console / db client.
+```
 
-  > **Additional note:**This stack is setup a bit differently than Blues. Remix is one Fly application, Hasura is another. The database is attached to Hasura. If you wanted to, you could connect to the database from Remix, but then you'd be better of using Prisma in the first place.
+You can also talk to the production instance with `hasura console` using --endpoint.
+
+> **Note:** Ensure that Docker has finished and your container is running before proceeding.
+
+> **Additional note:**This stack is setup a bit differently than Blues. Remix is one Fly application, Hasura is another.
+> The database is attached to Hasura. If you wanted to, you could connect to the database from Remix, but then you'd be better of using Prisma in the first place.
 
 - Run the first build:
 
@@ -60,14 +104,7 @@ Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --
   npm run dev
   ```
 
-This starts your app in development mode, rebuilding assets on file changes.
-
-The database seed script creates a new user with some data you can use to get started:
-
-- Email: `rachel@remix.run`
-- Password: `racheliscool`
-
-If you'd prefer not to use Docker, you can also use Fly's Wireguard VPN to connect to a development database (or even your production database). You can find the instructions to set up Wireguard [here](https://fly.io/docs/reference/private-networking/#install-your-wireguard-app), and the instructions for creating a development database [here](https://fly.io/docs/reference/postgres/).
+This starts your app in development mode, rebuilding assets on file changes. Open it, and try creating an account, or logging in with `rachel@remix.run` using the password `racheliscool`.
 
 ### Relevant code:
 
@@ -76,6 +113,8 @@ This is a pretty simple note-taking app, but it's a good example of how you can 
 - creating users, and logging in and out [./app/models/user.server.ts](./app/models/user.server.ts)
 - user sessions, and verifying them [./app/session.server.ts](app/server/session.server.ts)
 - creating, and deleting notes [./app/models/note.server.ts](./app/models/note.server.ts)
+
+Read more about the Hasura setup from [./hasura/README.md](hasura/README.md)
 
 ## Deployment
 
@@ -119,11 +158,6 @@ Prior to your first deployment, you'll need to do a few things:
   ```sh
   fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app remix-prog-stack
   fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app remix-prog-stack-staging
-
-  fly secrets set HASURA_URL="https://remix-prog-hasura.fly.dev/v1/graphql" --app remix-prog-stack
-  # fly secrets set HASURA_URL="http://remix-prog-hasura.internal/v1/graphql" --app remix-prog-stack
-
-  fly secrets set HASURA_ADMIN_SECRET="hunter1" --app remix-prog-stack
   ```
 
   > **Note:** When creating the staging secret, you may get a warning from the Fly CLI that looks like this:
@@ -135,22 +169,6 @@ Prior to your first deployment, you'll need to do a few things:
   > This simply means that the current directory contains a config that references the production app we created in the first step. Ignore this warning and proceed to create the secret.
 
   If you don't have openssl installed, you can also use [1password](https://1password.com/password-generator/) to generate a random secret, just replace `$(openssl rand -hex 32)` with the generated secret.
-
-- ~~Create a database for both your staging and production environments. Run the following~~:
-
-  ```sh
-  # fly postgres create --name remix-prog-stack-db
-  # fly postgres attach --postgres-app remix-prog-stack-db --app remix-prog-stack
-
-  # fly postgres create --name remix-prog-stack-staging-db
-  # fly postgres attach --postgres-app remix-prog-stack-staging-db --app # remix-prog-stack-staging
-  ```
-
-  > **Note:** You'll get the same warning for the same reason when attaching the staging database that you did in the `fly set secret` step above. No worries. Proceed!
-
-  > **Note #2:** Blues stack attached the database to the Remix application. The smart way to run Hasura is to run it as another app / container, which is what has been done here. Navigate to /hasura folder for instructions what to do instead.
-
-~~Fly will take care of setting the `DATABASE_URL` secret for you.~~ While Fly does set DATABASE_URL for us, that isn't much help when Hasura expects HASURA_GRAPHQL_DATABASE_URL.
 
 Now that everything is set up you can commit and push your changes to your repo. Every commit to your `main` branch will trigger a deployment to your production environment, and every commit to your `dev` branch will trigger a deployment to your staging environment.
 
