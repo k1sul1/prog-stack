@@ -6,6 +6,8 @@
 npx create-remix --template k1sul1/prog-stack
 ```
 
+_psst, if you open this README after running the command above, you get commands that you can just copy-paste! Just get a markdown preview plugin for your editor and you're good to go!_
+
 [Motivation behind the stack](https://www.youtube.com/watch?v=ZNIV2H-jmfM)
 
 I like Hasura more than I like Prisma. There, I said it. While Remix has killed almost every client side api call, I like having a GraphQL API and the option to talk to it from the browser.
@@ -91,7 +93,7 @@ You can also talk to the production instance with `hasura console` using --endpo
 
 > **Note:** Ensure that Docker has finished and your container is running before proceeding.
 
-> **Additional note:**This stack is setup a bit differently than Blues. Remix is one Fly application, Hasura is another.
+> **Additional note:** This stack is setup a bit differently than Blues. Remix is one Fly application, Hasura is another.
 > The database is attached to Hasura. If you wanted to, you could connect to the database from Remix, but then you'd be better of using Prisma in the first place.
 
 - Run the first build:
@@ -119,6 +121,8 @@ This is a pretty simple note-taking app, but it's a good example of how you can 
 Read more about the Hasura setup from [./hasura/README.md](hasura/README.md)
 
 ## Deployment
+
+After the initial setup, you can just `fly deploy`.
 
 This Remix Stack comes with two GitHub Actions that handle automatically deploying your app to production and staging environments.
 
