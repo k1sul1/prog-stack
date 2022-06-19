@@ -2,17 +2,6 @@
  * Generic utils that you're having a hard time finding a category for.
  */
 
-/**
- * Throws an error if condition doesn't evaluate to true, ie. value doesn't exist.
- *
- * @throws Error
- */
-export function invariant(condition: any, error: string): void {
-  if (condition) return;
-
-  throw new Error(error);
-}
-
 export const DEFAULT_REDIRECT = "/";
 
 /**

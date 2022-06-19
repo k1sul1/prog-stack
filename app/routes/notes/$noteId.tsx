@@ -14,21 +14,22 @@ type LoaderData = {
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const userUuid = await requireUserUuid(request);
-  invariant(params.noteId, "noteId not found");
-
   const note = await getNote({ userUuid, uuid: params.noteId! });
+
   if (!note) {
     throw new Response("Not Found", { status: 404 });
   }
+
   return json<LoaderData>({ note });
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-  const userUuid = await requireUserUuid(request);
-  invariant(params.noteId, "noteId not found");
+  await requireUserUuid(request);
 
+  // This doesn't care which user you are.
+  // This means that any user with a list of note uuids could delete them.
+  // I'm sure you can figure out how to prevent that.
   await deleteNote(params.noteId!);
-
   return redirect("/notes");
 };
 
