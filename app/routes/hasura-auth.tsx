@@ -8,7 +8,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   // sessionUser is NOT present when Hasura calls this webhook. It's here only so you can visit the endpoint and see what Hasura sees.
   const sessionUser = await getUser(request);
   const userUuid =
-    sessionUser?.uuid || request.headers.get("x-hasura-user-id") || null;
+    sessionUser?.uuid ||
+    request.headers.get("x-hasura-user-id") || // NOTE: Literally anyone can POST to your GraphQL
+    // endpoint, supplying this header containing an admins uuid, and so on. Should **probably**
+    // pass an encrypted version of the uuid instead and decrypt it here.
+    null;
 
   if (!userUuid) {
     // Use this if you want to allow unauthenticated users to do something.
