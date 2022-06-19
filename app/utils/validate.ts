@@ -1,8 +1,6 @@
 import type { User } from "~/models/user.server";
 import { UserRole } from "./user";
 
-type FormName = string;
-
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }

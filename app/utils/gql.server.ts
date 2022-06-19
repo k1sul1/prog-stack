@@ -1,11 +1,5 @@
-import type {
-  ClientError,
-  Variables,
-  RequestDocument} from "graphql-request";
-import {
-  GraphQLClient,
-  gql
-} from "graphql-request";
+import type { ClientError, Variables, RequestDocument } from "graphql-request";
+import { GraphQLClient, gql } from "graphql-request";
 import type { User } from "~/models/user.server";
 import { UserRole } from "./user";
 export { gql };
@@ -29,7 +23,7 @@ export function getAuthenticationHeaders(
     headers["x-hasura-user-id"] = user.uuid;
   }
 
-  // IIRC using the admin secret prevents Hasura from calling the webhook unnecessarily
+  // Using the admin secret prevents Hasura from calling the webhook unnecessarily.
   if (sudo || (user && user.role === UserRole.admin)) {
     headers["x-hasura-admin-secret"] = process.env.HASURA_ADMIN_SECRET;
   }

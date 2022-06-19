@@ -79,12 +79,15 @@ Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --
 
 - Start [Docker services](https://www.docker.com/get-started):
 
-If you'd prefer not to use Docker, ~~you can also use Fly's Wireguard VPN to connect to a development database (or even your production database). You can find the instructions to set up Wireguard [here](https://fly.io/docs/reference/private-networking/#install-your-wireguard-app), and the instructions for creating a development database [here](https://fly.io/docs/reference/postgres/).~~ you can just point the local application to the Hasura instance you will deploy a bit later.
+If you'd prefer not to use Docker locally, you can just point the local application to the Hasura instance you will deploy a bit later.
+
+You should really at least glance at [./hasura/README.md](hasura/README.md) before proceeding.
 
 ```sh
 cd hasura
-
-docker compose up [-d] # -d if you don't care about logs
+docker compose up # it's going to take a while to get started.
+# Open another terminal so you can see if something goes wrong
+# WAIT for db and hasura to be up before proceeding
 hasura seed # To populate the database
 hasura console # To open up the console / db client.
 ```
@@ -114,15 +117,17 @@ This starts your app in development mode, rebuilding assets on file changes. Ope
 
 This is a pretty simple note-taking app, but it's a good example of how you can build a full stack app with Hasura and Remix. The main functionality is creating users, logging in and out, and creating and deleting notes.
 
+In addition to that, foundations for row level permissions have been laid. Users that hold the role UserRole.user can only view and delete their own notes, but administrators can see and delete others notes. You can manage the permissions from `hasura console` or through the configuration files.
+
+![hasura console permission editor](https://user-images.githubusercontent.com/2719615/174500480-dbe5f54e-adb7-4ecf-bc2f-3244f475e9bd.png)
+
 - creating users, and logging in and out [./app/models/user.server.ts](./app/models/user.server.ts)
 - user sessions, and verifying them [./app/session.server.ts](app/utils/session.server.ts)
 - creating, and deleting notes [./app/models/note.server.ts](./app/models/note.server.ts)
 
-Read more about the Hasura setup from [./hasura/README.md](hasura/README.md)
-
 ## Deployment
 
-After the initial setup, you can just `fly deploy`.
+If you don't care about GH actions, you can just run `fly deploy` in this and `hasura` directory to deploy your project after the initial setup. Even if you don't use GH actions, the information still applies to you.
 
 This Remix Stack comes with two GitHub Actions that handle automatically deploying your app to production and staging environments.
 

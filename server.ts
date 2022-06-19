@@ -30,7 +30,7 @@ if (process.env.SESSION_SECRET === defSecret) {
 
 Using default session secret.
 
-Did you forget to create the .env file?
+Did you forget to provide it?
 
 ⚠️  ⚠️  ⚠️`);
 }

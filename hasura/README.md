@@ -1,5 +1,7 @@
 # Hasura with Remix on Fly
 
+Install Hasura CLI if you haven't already: https://hasura.io/docs/latest/graphql/core/hasura-cli/install-hasura-cli/
+
 To run Hasura locally, just run `docker-compose up`. To access the Hasura console, run `hasura console` from the hasura directory.
 
 Initial setup might include running this:
@@ -15,7 +17,7 @@ Rest of this document is about getting it running on Fly and your Remix applicat
 
 ## Setting it up
 
-**Setup the Remix application before proceeding with this.**
+**Setup the Remix application before proceeding with this.** And don't use `hunter1` as your admin secret!
 
 ```
 $ fly create remix-prog-stack-hasura
