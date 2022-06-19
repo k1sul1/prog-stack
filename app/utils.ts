@@ -1,15 +1,19 @@
-import { useMatches } from "@remix-run/react";
-import { useMemo } from "react";
+/**
+ * Generic utils that you're having a hard time finding a category for.
+ */
 
-import type { User } from "~/models/user.server";
-
+/**
+ * Throws an error if condition doesn't evaluate to true, ie. value doesn't exist.
+ *
+ * @throws Error
+ */
 export function invariant(condition: any, error: string): void {
   if (condition) return;
 
   throw new Error(error);
 }
 
-const DEFAULT_REDIRECT = "/";
+export const DEFAULT_REDIRECT = "/";
 
 /**
  * This should be used any time the redirect path is user-provided
@@ -34,44 +38,19 @@ export function safeRedirect(
 }
 
 /**
- * This base hook is used in other hooks to quickly search for specific data
- * across all loader data using useMatches.
- * @param {string} id The route id
- * @returns {JSON|undefined} The router data or undefined if not found
+ * Wait N milliseconds.
  */
-export function useMatchesData(
-  id: string
-): Record<string, unknown> | undefined {
-  const matchingRoutes = useMatches();
-  const route = useMemo(
-    () => matchingRoutes.find((route) => route.id === id),
-    [matchingRoutes, id]
-  );
-  return route?.data;
+export async function delay(ms: number) {
+  return await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isUser(user: any): user is User {
-  return user && typeof user === "object" && typeof user.email === "string";
-}
-
-export function useOptionalUser(): User | undefined {
-  const data = useMatchesData("root");
-  if (!data || !isUser(data.user)) {
-    return undefined;
+/**
+ * A very verbose console.log that only prints in the browser, regardless of where you place it.
+ *
+ * console.trace is used because using a function to breaks the built in trace in the console.
+ */
+export function log(...args: any): void {
+  if (typeof document === "object") {
+    console.trace(...args);
   }
-  return data.user;
-}
-
-export function useUser(): User {
-  const maybeUser = useOptionalUser();
-  if (!maybeUser) {
-    throw new Error(
-      "No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead."
-    );
-  }
-  return maybeUser;
-}
-
-export function validateEmail(email: unknown): email is string {
-  return typeof email === "string" && email.length > 3 && email.includes("@");
 }

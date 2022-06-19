@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import gqlReq, { gql } from "~/server/gql.server";
+import type { UserRole, UserStatus } from "~/utils/user";
 
 export type User = {
   uuid: string;
@@ -11,18 +12,6 @@ export type User = {
   meta: JSON | null;
 };
 export type UserWithPassword = User & { passhash: string };
-
-export enum UserRole {
-  Owner = 0,
-  Admin = 1,
-  User = 2,
-}
-
-export enum UserStatus {
-  Unconfirmed = 0,
-  Confirmed = 1,
-  Banned = 2,
-}
 
 export async function getAllUsers() {
   const { users } = await gqlReq<{ users: User[] }>(

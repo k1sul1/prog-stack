@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 
 import { requireUserUuid } from "~/server/session.server";
-import { useUser } from "~/utils";
+import { useUser } from "~/utils/hooks";
 import { getNoteListItems } from "~/models/note.server";
 
 type LoaderData = {

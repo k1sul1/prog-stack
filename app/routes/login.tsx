@@ -9,7 +9,10 @@ import * as React from "react";
 
 import { createUserSession, getUserUUID } from "~/server/session.server";
 import { verifyLogin } from "~/models/user.server";
-import { safeRedirect, validateEmail } from "~/utils";
+import { safeRedirect } from "~/utils";
+import { validateEmail } from "~/utils/validate";
+import { inputValidators, validateAndParseForm } from "~/utils/validate";
+import { UserRole, UserStatus } from "~/utils/user";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserUUID(request);
@@ -26,33 +29,19 @@ interface ActionData {
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const email = formData.get("email");
-  const password = formData.get("password");
-  const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
-  const remember = formData.get("remember");
+  const { errors, entries } = validateAndParseForm(
+    formData,
+    inputValidators.login
+  );
 
-  if (!validateEmail(email)) {
-    return json<ActionData>(
-      { errors: { email: "Email is invalid" } },
-      { status: 400 }
-    );
+  if (errors) {
+    return json<ActionData>({ errors }, { status: 400 });
   }
 
-  if (typeof password !== "string" || password.length === 0) {
-    return json<ActionData>(
-      { errors: { password: "Password is required" } },
-      { status: 400 }
-    );
-  }
+  const { email, password, redirectTo: unsafeRedirect, remember } = entries;
+  const redirectTo = safeRedirect(unsafeRedirect, "/");
 
-  if (password.length < 3) {
-    return json<ActionData>(
-      { errors: { password: "Password is too short" } },
-      { status: 400 }
-    );
-  }
-
-  const user = await verifyLogin(email, password);
+  const user = await verifyLogin(email as string, password as string);
 
   if (!user) {
     return json<ActionData>(

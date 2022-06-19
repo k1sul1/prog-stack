@@ -6,6 +6,8 @@ import * as React from "react";
 import { createNote } from "~/models/note.server";
 import { requireUserUuid } from "~/server/session.server";
 
+import { inputValidators, validateAndParseForm } from "~/utils/validate";
+
 type ActionData = {
   errors?: {
     title?: string;
@@ -15,26 +17,24 @@ type ActionData = {
 
 export const action: ActionFunction = async ({ request }) => {
   const userUuid = await requireUserUuid(request);
-
   const formData = await request.formData();
-  const title = formData.get("title");
-  const body = formData.get("body");
 
-  if (typeof title !== "string" || title.length === 0) {
-    return json<ActionData>(
-      { errors: { title: "Title is required" } },
-      { status: 400 }
-    );
+  const { errors, entries } = validateAndParseForm(
+    formData,
+    inputValidators.newNote
+  );
+
+  if (errors) {
+    return json<ActionData>({ errors }, { status: 400 });
   }
 
-  if (typeof body !== "string" || body.length === 0) {
-    return json<ActionData>(
-      { errors: { body: "Body is required" } },
-      { status: 400 }
-    );
-  }
+  const { title, body } = entries;
 
-  const note = await createNote({ title, body, userUuid });
+  const note = await createNote({
+    title: title as string,
+    body: body as string,
+    userUuid,
+  });
 
   return redirect(`/notes/${note.uuid}`);
 };
