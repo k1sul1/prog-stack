@@ -58,9 +58,9 @@ https://hasura.io/docs/latest/graphql/core/hasura-cli/hasura_seed/
 
 ## Migrations
 
-As long as you do your edits through `hasura console`, migrations should sort themselves out on `fly deploy`, assuming the process doesn't run out of memory...
+As long as you do your edits through `hasura console`, migrations should sort themselves out on `fly deploy`, assuming the process doesn't run out of memory... If you don't need the extra juice and wish to save some money, edit the Dockerfile so it doesn't use a cli-migrations version of Hasura, and run the migrations manually.
 
-You can also apply the migrations manually:
+To apply the migrations manually:
 
 ```
 #!/bin/sh
@@ -79,21 +79,32 @@ Hasura can work with the smallest available preset, shared cpu and 256MB of RAM.
 
 If you see something like this in a failed deployment, increase the memory. You can decrease it back afterward, but you're going to have to increase it again when you have to deploy again.
 
-2022-06-18T21:55:12Z [info]{"timestamp":"2022-06-18T21:55:12.000+0000","level":"info","type":"startup","detail":{"kind":"migrations-apply","info":"applying metadata from /hasura-metadata"}}
-2022-06-18T21:55:13Z [info][ 3.657854] \*\*Out of memory: Killed process 523 (graphql-engine) total-vm:1074264644kB, anon-rss:134036kB, file-rss:4kB, shmem-rss:0kB, UID:0 pgtables:404kB oom_score_adj:0
-2022-06-18T21:55:13Z [info]{"level":"info","msg":"Help us improve Hasura! The cli collects anonymized usage stats which\nallow us to keep improving Hasura at warp speed. To opt-out or read more,\nvisit https://hasura.io/docs/latest/graphql/core/guides/telemetry.html\n","time":"2022-06-18T21:55:13Z"}
-2022-06-18T21:55:13Z [info]{"level":"error","msg":"connecting to graphql-engine server failed","time":"2022-06-18T21:55:13Z"}
+> 2022-06-18T21:55:12Z [info]{"timestamp":"2022-06-18T21:55:12.000+0000","level":"info","type":"startup","detail":{"kind":"migrations-apply","info":"applying metadata from /hasura-metadata"}}
+>
+> 2022-06-18T21:55:13Z [info][ 3.657854] \*\*Out of memory: Killed process 523 (graphql-engine) total-vm:1074264644kB, anon-rss:134036kB, file-rss:4kB, shmem-rss:0kB, UID:0 pgtables:404kB oom_score_adj:0
+>
+> 2022-06-18T21:55:13Z [info]{"level":"info","msg":"Help us improve Hasura! The cli collects anonymized usage stats which\nallow us to keep improving Hasura at warp speed. To opt-out or read more,\nvisit https://hasura.io/docs/latest/graphql/core/guides/telemetry.html\n","time":"2022-06-18T21:55:13Z"}
+>
+> 2022-06-18T21:55:13Z [info]{"level":"error","msg":"connecting to graphql-engine server failed","time":"2022-06-18T21:55:13Z"}
 
 Don't be fooled by what's under it:
 
-2022-06-18T21:55:13Z [info]{"level":"info","msg":"**possible reasons:**","time":"2022-06-18T21:55:13Z"}
-2022-06-18T21:55:13Z [info]{"level":"info","msg":"1) Provided root endpoint of graphql-engine server is wrong. Verify endpoint key in config.yaml or/and value of --endpoint flag","time":"2022-06-18T21:55:13Z"}
-2022-06-18T21:55:13Z [info]{"level":"info","msg":"3) Server might be unhealthy and is not running/accepting API requests","time":"2022-06-18T21:55:13Z"}
-t should be: https://hasura-cloud-app.io","time":"2022-06-18T21:55:13Z"}
-2022-06-18T21:55:13Z [info]{"level":"info","msg":"3) **Server might be unhealthy and is not running/accepting API requests**","time":"2022-06-18T21:55:13Z"}
-2022-06-18T21:55:13Z [info]{"level":"info","msg":"4) Admin secret is not correct/set","time":"2022-06-18T21:55:13Z"}
-2022-06-18T21:55:13Z [info]{"level":"info","msg":"","time":"2022-06-18T21:55:13Z"}
-2022-06-18T21:55:13Z [info]time="2022-06-18T21:55:13Z" level=fatal msg="making http request failed: Get \"http://localhost:9691/v1/version\": read tcp 127.0.0.1:45740->127.0.0.1:9691: read: connection reset by peer"
-2022-06-18T21:55:13Z [info]Main child exited normally with code: 1
-2022-06-18T21:55:13Z [info]Starting clean up.
---> v19 failed - Failed due to unhealthy allocations - not rolling back to stable job version 19 as current job has same specification and deploying as v20
+> 2022-06-18T21:55:13Z [info]{"level":"info","msg":"**possible reasons:**","time":"2022-06-18T21:55:13Z"}
+>
+> 2022-06-18T21:55:13Z [info]{"level":"info","msg":"1) Provided root endpoint of graphql-engine server is wrong. Verify endpoint key in config.yaml or/and value of --endpoint flag","time":"2022-06-18T21:55:13Z"}
+>
+> 2022-06-18T21:55:13Z [info]{"level":"info","msg":"3) Server might be unhealthy and is not running/accepting API requests","time":"2022-06-18T21:55:13Z"}
+>
+> t should be: https://hasura-cloud-app.io","time":"2022-06-18T21:55:13Z"}
+> 2022-06-18T21:55:13Z [info]{"level":"info","msg":"3) **Server might be unhealthy and is not running/accepting API requests**","time":"2022-06-18T21:55:13Z"}
+>
+> 2022-06-18T21:55:13Z [info]{"level":"info","msg":"4) Admin secret is not correct/set","time":"2022-06-18T21:55:13Z"}
+>
+> 2> 022-06-18T21:55:13Z [info]{"level":"info","msg":"","time":"2022-06-18T21:55:13Z"}
+> 2022-06-18T21:55:13Z [info]time="2022-06-18T21:55:13Z" level=fatal msg="making http request failed: Get \"http://localhost:9691/v1/version\": read tcp 127.0.0.1:45740->127.0.0.1:9691: read: connection reset by peer"
+>
+> 2022-06-18T21:55:13Z [info]Main child exited normally with code: 1
+>
+> 2022-06-18T21:55:13Z [info]Starting clean up.
+>
+> --> v19 failed - Failed due to unhealthy allocations - not rolling back to stable job version 19 as current job has same specification and deploying as v20
