@@ -1,11 +1,13 @@
 /**
- * This allows the most basic type of user levels. For more granularity, you should
- * switch to capabilities and do them in the database. Hasura will be your best friend with that.
+ * UserRole maps to Hasura roles and can be used to make role based restrictions.
+ *
+ * The role that an user has decides how to authorize with Hasura. UserRole.admin will use process.env.HASURA_ADMIN_SECRET, while other roles use webhook authorization.
  */
 export enum UserRole {
-  Owner = 0,
-  Admin = 1,
-  User = 2,
+  admin = 0,
+  owner = 1,
+  moderator = 2,
+  user = 999,
 }
 
 /**

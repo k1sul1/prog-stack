@@ -51,7 +51,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const user = await createUser(
     email as string,
-    UserRole.User,
+    UserRole.user,
     UserStatus.Unconfirmed,
     password as string
   );

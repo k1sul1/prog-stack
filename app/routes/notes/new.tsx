@@ -4,9 +4,11 @@ import { Form, useActionData } from "@remix-run/react";
 import * as React from "react";
 
 import { createNote } from "~/models/note.server";
-import { requireUserUuid } from "~/utils/session.server";
+import { requireUser, requireUserUuid } from "~/utils/session.server";
 
 import { inputValidators, validateAndParseForm } from "~/utils/validate";
+import { CatchBoundary, ErrorBoundary } from "~/routes/notes/$noteId";
+export { CatchBoundary, ErrorBoundary }; // Sharing is caring!
 
 type ActionData = {
   errors?: {
@@ -16,7 +18,7 @@ type ActionData = {
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  const userUuid = await requireUserUuid(request);
+  const user = await requireUser(request);
   const formData = await request.formData();
 
   const { errors, entries } = validateAndParseForm(
@@ -30,11 +32,13 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { title, body } = entries;
 
-  const note = await createNote({
-    title: title as string,
-    body: body as string,
-    userUuid,
-  });
+  const note = await createNote(
+    {
+      title: title as string,
+      body: body as string,
+    },
+    user
+  );
 
   return redirect(`/notes/${note.uuid}`);
 };

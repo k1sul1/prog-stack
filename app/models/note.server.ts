@@ -1,5 +1,5 @@
-import { User } from "./user.server";
-import gqlReq, { gql } from "~/utils/gql.server";
+import type { User } from "./user.server";
+import gqlReq, { getAuthenticationHeaders, gql } from "~/utils/gql.server";
 
 export type Note = {
   uuid: string;
@@ -10,16 +10,14 @@ export type Note = {
   user: string;
 };
 
-export async function getNote({
-  uuid,
-  userUuid,
-}: Pick<Note, "uuid"> & {
-  userUuid: User["uuid"];
-}) {
+export async function getNote(uuid: Note["uuid"], user: User) {
   const { notes } = await gqlReq<{ notes: Note[] }>(
     gql`
       query getNote($uuid: uuid, $user: uuid) {
-        notes(where: { uuid: { _eq: $uuid }, user: { _eq: $user } }) {
+        # You can hard-prevent querying other peoples notes by adding the user to the query.
+        # That's totally unnecessary if you use Hasura permissions!
+        # notes(where: { uuid: { _eq: $uuid }, user: { _eq: $user } }) {
+        notes(where: { uuid: { _eq: $uuid } }) {
           uuid
           title
           body
@@ -29,7 +27,11 @@ export async function getNote({
         }
       }
     `,
-    { uuid, user: userUuid }
+    { uuid },
+
+    // I've set permissions so that admins and owners can query other peoples notes.
+    // Standard user with the role `user` can't.
+    getAuthenticationHeaders(user)
   );
 
   if (!notes.length) {
@@ -39,14 +41,10 @@ export async function getNote({
   return notes[0];
 }
 
-export async function getNoteListItems({
-  userUuid,
-}: {
-  userUuid: User["uuid"];
-}) {
+export async function getNotesForUser(user: User) {
   const { notes } = await gqlReq<{ notes: Note[] }>(
     gql`
-      query getNoteListItems($user: uuid) {
+      query getNotesForUser($user: uuid) {
         notes(where: { user: { _eq: $user } }) {
           uuid
           title
@@ -57,19 +55,17 @@ export async function getNoteListItems({
         }
       }
     `,
-    { user: userUuid }
+    { user: user.uuid },
+    getAuthenticationHeaders(user)
   );
 
   return notes;
 }
 
-export async function createNote({
-  body,
-  title,
-  userUuid,
-}: Pick<Note, "body" | "title"> & {
-  userUuid: User["uuid"];
-}) {
+export async function createNote(
+  { body, title }: Pick<Note, "body" | "title">,
+  user: User
+) {
   const { insert_notes_one: note } = await gqlReq<{ insert_notes_one: Note }>(
     gql`
       mutation CreateNote($object: notes_insert_input!) {
@@ -87,17 +83,18 @@ export async function createNote({
       object: {
         title,
         body,
-        user: userUuid,
+        user: user.uuid,
       },
-    }
+    },
+    getAuthenticationHeaders(user)
   );
 
   return note;
 }
 
-export async function deleteNote(uuid: string) {
+export async function deleteNote(uuid: string, user: User) {
   const { delete_notes_by_pk: deletedNotes } = await gqlReq<{
-    delete_notes_by_pk: Note[];
+    delete_notes_by_pk: Note;
   }>(
     gql`
       mutation deleteNote($uuid: uuid!) {
@@ -113,8 +110,9 @@ export async function deleteNote(uuid: string) {
     `,
     {
       uuid,
-    }
+    },
+    getAuthenticationHeaders(user)
   );
 
-  return deletedNotes[0];
+  return deletedNotes;
 }

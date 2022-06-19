@@ -9,3 +9,120 @@ array_relationships:
         table:
           schema: public
           name: notes
+insert_permissions:
+  - role: moderator
+    permission:
+      check: {}
+      columns:
+        - email
+        - fname
+        - lname
+        - meta
+        - passhash
+        - role
+        - status
+  - role: owner
+    permission:
+      check: {}
+      columns:
+        - email
+        - fname
+        - lname
+        - meta
+        - passhash
+        - role
+        - status
+select_permissions:
+  - role: moderator
+    permission:
+      columns:
+        - email
+        - fname
+        - lname
+        - meta
+        - passhash
+        - role
+        - status
+        - uuid
+      filter: {}
+  - role: owner
+    permission:
+      columns:
+        - email
+        - fname
+        - lname
+        - meta
+        - passhash
+        - role
+        - status
+        - uuid
+      filter: {}
+  - role: user
+    permission:
+      columns:
+        - role
+        - status
+        - meta
+        - email
+        - fname
+        - lname
+        - passhash
+        - uuid
+      filter:
+        uuid:
+          _eq: X-Hasura-User-Id
+update_permissions:
+  - role: moderator
+    permission:
+      columns:
+        - email
+        - fname
+        - lname
+        - meta
+        - passhash
+        - role
+        - status
+      filter: {}
+      check: {}
+  - role: owner
+    permission:
+      columns:
+        - email
+        - fname
+        - lname
+        - meta
+        - passhash
+        - role
+        - status
+      filter: {}
+      check: {}
+  - role: user
+    permission:
+      columns:
+        - role
+        - status
+        - meta
+        - email
+        - fname
+        - lname
+        - passhash
+        - uuid
+      filter:
+        uuid:
+          _eq: X-Hasura-User-Id
+      check: null
+delete_permissions:
+  - role: moderator
+    permission:
+      backend_only: false
+      filter: {}
+  - role: owner
+    permission:
+      backend_only: false
+      filter: {}
+  - role: user
+    permission:
+      backend_only: false
+      filter:
+        uuid:
+          _eq: X-Hasura-User-Id

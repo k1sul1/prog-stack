@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import gqlReq, { gql } from "~/utils/gql.server";
+import gqlReq, { getAuthenticationHeaders, gql } from "~/utils/gql.server";
 import type { UserRole, UserStatus } from "~/utils/user";
 
 export type User = {
@@ -13,6 +13,10 @@ export type User = {
 };
 export type UserWithPassword = User & { passhash: string };
 
+/**
+ * Get ALL users.
+ * This function works even if the current user doesn't have permission to list all users. Use it accordingly.
+ */
 export async function getAllUsers() {
   const { users } = await gqlReq<{ users: User[] }>(
     gql`
@@ -28,12 +32,17 @@ export async function getAllUsers() {
         }
       }
     `,
-    {}
+    {},
+    getAuthenticationHeaders(null, true)
   );
 
   return users;
 }
 
+/**
+ * Get user by UUID.
+ * This function works even if the current user doesn't have permission to select users. Use it accordingly.
+ */
 export async function getUserByUUID(uuid: User["uuid"]) {
   const { users } = await gqlReq<{ users: User[] }>(
     gql`
@@ -49,7 +58,8 @@ export async function getUserByUUID(uuid: User["uuid"]) {
         }
       }
     `,
-    { uuid }
+    { uuid },
+    getAuthenticationHeaders(null, true)
   );
 
   if (!users.length) {
@@ -59,6 +69,10 @@ export async function getUserByUUID(uuid: User["uuid"]) {
   return users[0];
 }
 
+/**
+ * Get user by email.
+ * This function works even if the current user doesn't have permission to select users. Use it accordingly.
+ */
 export async function getUserByEmail(email: User["email"]) {
   const { users } = await gqlReq<{ users: User[] }>(
     gql`
@@ -74,7 +88,8 @@ export async function getUserByEmail(email: User["email"]) {
         }
       }
     `,
-    { email }
+    { email },
+    getAuthenticationHeaders(null, true)
   );
 
   if (!users.length) {
@@ -84,6 +99,10 @@ export async function getUserByEmail(email: User["email"]) {
   return users[0];
 }
 
+/**
+ * Create a new user.
+ * This function works even if the current user doesn't have permission to create users. Use it accordingly.
+ */
 export async function createUser(
   email: string,
   role: UserRole,
@@ -112,16 +131,25 @@ export async function createUser(
         status,
         passhash: hashedPassword,
       },
-    }
+    },
+    getAuthenticationHeaders(null, true)
   );
 
   return user;
 }
 
+/**
+ * Delete user by email address.
+ * This function works even if the current user doesn't have permission to delete users. Use it accordingly.
+ */
 export async function deleteUserByEmail(email: User["email"]) {
   return await deleteUser(email);
 }
 
+/**
+ * Delete user.
+ * This function works even if the current user doesn't have permission to delete users. Use it accordingly.
+ */
 export async function deleteUser(user: User | User["email"]) {
   const email = typeof user === "string" ? user : user["email"];
 
@@ -141,12 +169,17 @@ export async function deleteUser(user: User | User["email"]) {
     `,
     {
       email,
-    }
+    },
+    getAuthenticationHeaders(null, true)
   );
 
   return deletedUsers[0];
 }
 
+/**
+ * Verifies login attempt.
+ * This function works even if the current user doesn't have permission to select users. Use it accordingly.
+ */
 export async function verifyLogin(email: User["email"], password: string) {
   const { users } = await gqlReq<{ users: UserWithPassword[] }>(
     gql`
@@ -167,7 +200,8 @@ export async function verifyLogin(email: User["email"], password: string) {
     `,
     {
       email,
-    }
+    },
+    getAuthenticationHeaders(null, true)
   );
 
   if (!users.length) {

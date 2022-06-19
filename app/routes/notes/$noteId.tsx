@@ -1,20 +1,19 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
-import { invariant } from "~/utils";
 
 import type { Note } from "~/models/note.server";
 import { deleteNote } from "~/models/note.server";
 import { getNote } from "~/models/note.server";
-import { requireUserUuid } from "~/utils/session.server";
+import { requireUser } from "~/utils/session.server";
 
 type LoaderData = {
   note: Note;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const userUuid = await requireUserUuid(request);
-  const note = await getNote({ userUuid, uuid: params.noteId! });
+  const user = await requireUser(request);
+  const note = await getNote(params.noteId!, user);
 
   if (!note) {
     throw new Response("Not Found", { status: 404 });
@@ -24,12 +23,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserUuid(request);
+  const user = await requireUser(request);
+  const deleted = await deleteNote(params.noteId!, user);
 
-  // This doesn't care which user you are.
-  // This means that any user with a list of note uuids could delete them.
-  // I'm sure you can figure out how to prevent that.
-  await deleteNote(params.noteId!);
+  console.log("Deleted note!", deleted);
+
   return redirect("/notes");
 };
 

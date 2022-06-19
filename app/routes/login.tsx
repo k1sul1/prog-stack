@@ -10,9 +10,7 @@ import * as React from "react";
 import { createUserSession, getUserUUID } from "~/utils/session.server";
 import { verifyLogin } from "~/models/user.server";
 import { safeRedirect } from "~/utils";
-import { validateEmail } from "~/utils/validate";
 import { inputValidators, validateAndParseForm } from "~/utils/validate";
-import { UserRole, UserStatus } from "~/utils/user";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserUUID(request);
@@ -49,6 +47,8 @@ export const action: ActionFunction = async ({ request }) => {
       { status: 400 }
     );
   }
+
+  console.log("about to create session with user", user);
 
   return createUserSession({
     request,

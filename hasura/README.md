@@ -25,8 +25,10 @@ $ fly postgres attach --postgres-app remix-prog-stack-hasura-db --app remix-prog
 $ fly secrets set HASURA_GRAPHQL_DATABASE_URL="[DATABASE_URL_FROM_ATTACH]" --app remix-prog-stack-hasura
 
 $ fly secrets set HASURA_GRAPHQL_ADMIN_SECRET="hunter1" --app remix-prog-stack-hasura
+$ fly secrets set HASURA_GRAPHQL_AUTH_HOOK="https://remix-prog-stack.fly.dev/hasura-auth" --app remix-prog-stack-hasura
 
 # Before running this, go and change the memory limit to 512. Otherwise your deploy will fail.
+# https://fly.io/apps/remix-prog-stack-hasura/scale
 $ fly deploy
 ```
 
@@ -77,7 +79,7 @@ hasura metadata reload --endpoint https://remix-prog-stack-hasura.fly.dev
 
 Hasura can work with the smallest available preset, shared cpu and 256MB of RAM. However, migrations will not.
 
-If you see something like this in a failed deployment, increase the memory. You can decrease it back afterward, but you're going to have to increase it again when you have to deploy again.
+If you see something like this in a failed deployment, increase the memory.
 
 > 2022-06-18T21:55:12Z [info]{"timestamp":"2022-06-18T21:55:12.000+0000","level":"info","type":"startup","detail":{"kind":"migrations-apply","info":"applying metadata from /hasura-metadata"}}
 >

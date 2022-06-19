@@ -2,17 +2,17 @@ import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 
-import { requireUserUuid } from "~/utils/session.server";
+import { requireUser } from "~/utils/session.server";
 import { useUser } from "~/utils/hooks";
-import { getNoteListItems } from "~/models/note.server";
+import { getNotesForUser } from "~/models/note.server";
 
 type LoaderData = {
-  noteListItems: Awaited<ReturnType<typeof getNoteListItems>>;
+  noteListItems: Awaited<ReturnType<typeof getNotesForUser>>;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userUuid = await requireUserUuid(request);
-  const noteListItems = await getNoteListItems({ userUuid });
+  const user = await requireUser(request);
+  const noteListItems = await getNotesForUser(user);
   return json<LoaderData>({ noteListItems });
 };
 

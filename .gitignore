@@ -15,6 +15,6 @@ node_modules
 /cypress/videos
 /hasura/postgres-data
 
-/app/styles/tailwind.css
+/app/generatedcss
 .DS_Store
 hasura/migrate.sh
