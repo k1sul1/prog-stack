@@ -31,7 +31,7 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const { errors, entries } = validateAndParseForm(
     formData,
-    inputValidators.login
+    inputValidators.join
   );
 
   if (errors) {

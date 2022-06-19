@@ -2,6 +2,15 @@
 
 To run Hasura locally, just run `docker-compose up`. To access the Hasura console, run `hasura console` from the hasura directory.
 
+Initial setup might include running this:
+
+```
+hasura metadata apply
+hasura migrate apply
+hasura metadata reload
+hasura seed apply
+```
+
 Rest of this document is about getting it running on Fly and your Remix application talking to it.
 
 ## Setting it up

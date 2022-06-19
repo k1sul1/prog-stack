@@ -1,6 +1,6 @@
 # fly.toml file generated for remix-prog-hasura on 2022-06-18T05:30:13+03:00
 
-app = "remix-prog-hasura"
+app = "remix-prog-stack-hasura"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []

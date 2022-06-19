@@ -12,7 +12,11 @@ export function validateEmail(email: unknown): email is string {
  *
  * See @validateAndParseForm
  */
-export const inputValidators: Record<FormName, FormInputValidators> = {
+export const inputValidators: {
+  join: FormInputValidators;
+  newNote: FormInputValidators;
+  editUser: FormInputValidators;
+} = {
   join: {
     email: (v) =>
       !validateEmail(v) ? "That does not look like a valid email." : false,
