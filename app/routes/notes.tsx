@@ -2,7 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 
-import { requireUserUuid } from "~/server/session.server";
+import { requireUserUuid } from "~/utils/session.server";
 import { useUser } from "~/utils/hooks";
 import { getNoteListItems } from "~/models/note.server";
 

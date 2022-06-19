@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import gqlReq, { gql } from "~/server/gql.server";
+import gqlReq, { gql } from "~/utils/gql.server";
 import type { UserRole, UserStatus } from "~/utils/user";
 
 export type User = {

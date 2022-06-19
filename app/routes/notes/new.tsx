@@ -4,7 +4,7 @@ import { Form, useActionData } from "@remix-run/react";
 import * as React from "react";
 
 import { createNote } from "~/models/note.server";
-import { requireUserUuid } from "~/server/session.server";
+import { requireUserUuid } from "~/utils/session.server";
 
 import { inputValidators, validateAndParseForm } from "~/utils/validate";
 

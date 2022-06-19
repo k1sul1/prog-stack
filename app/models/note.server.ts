@@ -1,5 +1,5 @@
 import { User } from "./user.server";
-import gqlReq, { gql } from "~/server/gql.server";
+import gqlReq, { gql } from "~/utils/gql.server";
 
 export type Note = {
   uuid: string;

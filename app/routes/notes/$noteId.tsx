@@ -6,7 +6,7 @@ import { invariant } from "~/utils";
 import type { Note } from "~/models/note.server";
 import { deleteNote } from "~/models/note.server";
 import { getNote } from "~/models/note.server";
-import { requireUserUuid } from "~/server/session.server";
+import { requireUserUuid } from "~/utils/session.server";
 
 type LoaderData = {
   note: Note;

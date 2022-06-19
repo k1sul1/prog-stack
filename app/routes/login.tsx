@@ -7,7 +7,7 @@ import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import * as React from "react";
 
-import { createUserSession, getUserUUID } from "~/server/session.server";
+import { createUserSession, getUserUUID } from "~/utils/session.server";
 import { verifyLogin } from "~/models/user.server";
 import { safeRedirect } from "~/utils";
 import { validateEmail } from "~/utils/validate";
