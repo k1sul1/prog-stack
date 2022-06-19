@@ -18,14 +18,15 @@ Rest of this document is about getting it running on Fly and your Remix applicat
 **Setup the Remix application before proceeding with this.**
 
 ```
-$ fly create remix-prog-hasura
-$ fly postgres create --name remix-prog-hasura-db
-$ fly postgres attach --postgres-app remix-prog-hasura-db --app remix-prog-hasura
+$ fly create remix-prog-stack-hasura
+$ fly postgres create --name remix-prog-stack-hasura-db
+$ fly postgres attach --postgres-app remix-prog-stack-hasura-db --app remix-prog-stack-hasura
 
-$ fly secrets set HASURA_GRAPHQL_DATABASE_URL="[DATABASE_URL_FROM_ATTACH]" --app remix-prog-hasura
+$ fly secrets set HASURA_GRAPHQL_DATABASE_URL="[DATABASE_URL_FROM_ATTACH]" --app remix-prog-stack-hasura
 
-$ fly secrets set HASURA_GRAPHQL_ADMIN_SECRET="hunter1" --app remix-prog-hasura
+$ fly secrets set HASURA_GRAPHQL_ADMIN_SECRET="hunter1" --app remix-prog-stack-hasura
 
+# Before running this, go and change the memory limit to 512. Otherwise your deploy will fail.
 $ fly deploy
 ```
 
@@ -33,10 +34,10 @@ Then configure the application so it so it can talk to Hasura.
 
 ```
 
-fly secrets set HASURA_URL="https://remix-prog-hasura.fly.dev/v1/graphql" --app remix-prog-stack
+fly secrets set HASURA_URL="https://remix-prog-stack-hasura.fly.dev/v1/graphql" --app remix-prog-stack
 
 # This should also work, but it didn't for me.
-# fly secrets set HASURA_URL="http://remix-prog-hasura.internal/v1/graphql" --app remix-prog-stack
+# fly secrets set HASURA_URL="http://remix-prog-stack-hasura.internal/v1/graphql" --app remix-prog-stack
 
 fly secrets set HASURA_ADMIN_SECRET="hunter1" --app remix-prog-stack
 ```
@@ -47,7 +48,7 @@ fly secrets set HASURA_ADMIN_SECRET="hunter1" --app remix-prog-stack
 ## Seeding the database
 
 ```
-hasura seed apply --endpoint https://remix-prog-hasura.fly.dev
+hasura seed apply --endpoint https://remix-prog-stack-hasura.fly.dev
 ```
 
 To seed the local database, just leave the endpoint parameter out.
@@ -65,11 +66,11 @@ You can also apply the migrations manually:
 #!/bin/sh
 # migrate.sh
 
-echo "Applying migrations on https://remix-prog-hasura.fly.dev"
+echo "Applying migrations on https://remix-prog-stack-hasura.fly.dev"
 
-hasura metadata apply --endpoint https://remix-prog-hasura.fly.dev
-hasura migrate apply --all-databases --endpoint https://remix-prog-hasura.fly.dev
-hasura metadata reload --endpoint https://remix-prog-hasura.fly.dev
+hasura metadata apply --endpoint https://remix-prog-stack-hasura.fly.dev
+hasura migrate apply --all-databases --endpoint https://remix-prog-stack-hasura.fly.dev
+hasura metadata reload --endpoint https://remix-prog-stack-hasura.fly.dev
 ```
 
 ## VM Requirements
