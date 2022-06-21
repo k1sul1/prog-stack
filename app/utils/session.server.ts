@@ -1,6 +1,7 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import { createToken, Token, TokenType } from "~/models/token.server";
 
-import type { User } from "~/models/user.server";
+import type { User, UserWithToken } from "~/models/user.server";
 import { getUserByUUID } from "~/models/user.server";
 
 export const sessionStorage = createCookieSessionStorage({
@@ -14,7 +15,8 @@ export const sessionStorage = createCookieSessionStorage({
   },
 });
 
-const USER_SESSION_KEY = "userId";
+export const USER_SESSION_KEY = "userId";
+export const USER_SESSION_HASURA_TOKEN = "hasuraToken";
 
 export async function getSession(request: Request) {
   const cookie = request.headers.get("Cookie");
@@ -54,28 +56,44 @@ export async function requireUserUuid(
   return userId;
 }
 
-export async function requireUser(request: Request) {
+export async function requireUser(request: Request, withHasuraToken = true) {
   const userUuid = await requireUserUuid(request);
   const user = await getUserByUUID(userUuid);
+  const session = await getSession(request);
 
-  if (user) return user;
+  if (user) {
+    const hasuraToken = session.has(USER_SESSION_HASURA_TOKEN)
+      ? session.get(USER_SESSION_HASURA_TOKEN)
+      : null;
+
+    const withToken: UserWithToken = {
+      hasuraToken,
+      ...user,
+    };
+
+    return withToken;
+  }
 
   throw await logout(request);
 }
 
 export async function createUserSession({
   request,
-  userId,
+  userUuid,
   remember,
   redirectTo,
 }: {
   request: Request;
-  userId: string;
+  userUuid: User["uuid"];
   remember: boolean;
   redirectTo: string;
 }) {
   const session = await getSession(request);
-  session.set(USER_SESSION_KEY, userId);
+  const { token } = await createToken(userUuid, TokenType.HasuraAuth);
+
+  session.set(USER_SESSION_KEY, userUuid);
+  session.set(USER_SESSION_HASURA_TOKEN, token);
+
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session, {

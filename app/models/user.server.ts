@@ -12,6 +12,7 @@ export type User = {
   meta: JSON | null;
 };
 export type UserWithPassword = User & { passhash: string };
+export type UserWithToken = User & { hasuraToken: string };
 
 /**
  * Get ALL users.

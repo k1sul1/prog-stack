@@ -1,8 +1,6 @@
 import type { ClientError, Variables, RequestDocument } from "graphql-request";
 import { GraphQLClient, gql } from "graphql-request";
-import { getToken, Token, TokenType } from "~/models/token.server";
-import type { User } from "~/models/user.server";
-import { UserRole } from "./user";
+import type { UserWithToken } from "~/models/user.server";
 export { gql };
 
 export const client = new GraphQLClient(process.env.HASURA_URL);
@@ -15,7 +13,7 @@ export const client = new GraphQLClient(process.env.HASURA_URL);
  * the sudo param as an escape hatch.
  */
 export async function getAuthenticationHeaders(
-  user: User | null,
+  user: UserWithToken | null,
   sudo = false
 ): Promise<Record<string, string>> {
   let headers: Record<string, string> = {};
@@ -27,12 +25,7 @@ export async function getAuthenticationHeaders(
   if (sudo) {
     headers["x-hasura-admin-secret"] = process.env.HASURA_ADMIN_SECRET;
   } else if (user) {
-    const { token } = (await getToken(
-      user.uuid,
-      TokenType.HasuraAuth
-    )) as Token;
-
-    headers["Authorization"] = token;
+    headers["Authorization"] = user.hasuraToken;
   }
 
   return headers;

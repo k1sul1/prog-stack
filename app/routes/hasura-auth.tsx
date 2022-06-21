@@ -5,39 +5,37 @@ import { getUserByUUID } from "~/models/user.server";
 import { getUser } from "~/utils/session.server";
 import { UserRole } from "~/utils/user";
 
+/**
+ * Webhook that Hasura uses to authorize.
+ *
+ * Error messages are for debugging purposes only, they don't serve a purpose to Hasura.
+ */
 export const loader: LoaderFunction = async ({ params, request }) => {
   const authHeader = request.headers.get("Authorization");
-  const untrustworthyUuid =
-    request.headers.get("x-hasura-user-id") || // NOTE: Literally anyone can POST to your GraphQL
-    // endpoint, supplying this header containing an admins uuid, and so on. Should **probably**
-    // pass an encrypted version of the uuid instead and decrypt it here.
-    null;
+
+  // This is user input:
+  const untrustworthyUuid = request.headers.get("x-hasura-user-id");
 
   if (!untrustworthyUuid || !authHeader) {
-    console.log("PERKELE", untrustworthyUuid, authHeader);
-    return json(
-      {
-        message: "No UUID or Authorization header provided.",
-      },
-      401
-    );
+    const message = "UUID and / or Auth header missing.";
+
+    return json({ message }, 401);
   }
 
   const user = await getUserByUUID(untrustworthyUuid);
-  const token = await getToken(
-    untrustworthyUuid,
-    TokenType.HasuraAuth,
-    undefined,
-    false // No point in generating a token if it doesn't exist, it can't be the same as in authHeader if we do
-  );
+  const token = await getToken(untrustworthyUuid, TokenType.HasuraAuth);
 
-  if (token?.token === authHeader || !user) {
-    return json(
-      {
-        message: "User is unauthenticated",
-      },
-      401
-    );
+  const tokenMatchesAuthHeader = token?.token === authHeader;
+  const tokenIsExpired =
+    Date.now() > new Date(token?.token || "1970-01-01").getTime();
+
+  if (!tokenMatchesAuthHeader || !user || tokenIsExpired) {
+    let message = "Unauthenticated";
+
+    if (!tokenMatchesAuthHeader) message = "Header token mismatch";
+    if (tokenIsExpired) message = "Token is expired";
+
+    return json({ message }, 401);
   } else {
     return json(
       {

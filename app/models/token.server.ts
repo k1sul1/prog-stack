@@ -1,5 +1,4 @@
 import gqlReq, { getAuthenticationHeaders, gql } from "~/utils/gql.server";
-import LRUCache from "lru-cache";
 import { User } from "./user.server";
 import crypto from "crypto";
 
@@ -17,24 +16,10 @@ export type Token = {
 
 export const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
-export const TokenCache = new LRUCache({
-  max: 500,
-});
-
-const getKey = (uuid: User["uuid"], type: TokenType) => `${uuid}-${type}`;
-
 export async function getToken(
   userUuid: User["uuid"],
-  type: TokenType,
-  expiresMs = DAY_IN_MS,
-  generate = true
+  type: TokenType
 ): Promise<Token | null> {
-  const cached = TokenCache.get<Token>(getKey(userUuid, type));
-
-  if (cached) {
-    return cached;
-  }
-
   const now = Date.now();
   const { tokens } = await gqlReq<{ tokens: Token[] }>(
     gql`
@@ -50,25 +35,19 @@ export async function getToken(
     await getAuthenticationHeaders(null, true)
   );
 
-  if (!tokens.length && !generate) {
+  if (!tokens.length) {
     return null;
   }
 
-  let token = tokens[0]
-    ? tokens[0]
-    : await createToken(userUuid, type, expiresMs);
-  let expDate = new Date(token.expires).getTime();
-  let ttl = expDate - now;
+  const token = tokens[0];
 
-  if (expDate >= now) {
-    token = await createToken(userUuid, type, expiresMs);
-    expDate = new Date(token.expires).getTime();
-    ttl = expDate - now;
+  if (now >= new Date(token.expires).getTime()) {
+    // Expired! You should setup a task which peridiocally destroys expired tokens from the db.
+
+    return null;
   }
 
-  TokenCache.set(getKey(userUuid, type), token, { ttl });
-
-  return token;
+  return tokens[0];
 }
 
 export async function createToken(
@@ -76,6 +55,12 @@ export async function createToken(
   type: TokenType,
   expiresMs = DAY_IN_MS
 ) {
+  const existing = await getToken(userUuid, type);
+
+  if (existing) {
+    return existing;
+  }
+
   const str = crypto.randomBytes(16).toString("hex");
   const { insert_tokens_one: token } = await gqlReq<{
     insert_tokens_one: Token;
@@ -100,8 +85,6 @@ export async function createToken(
     },
     await getAuthenticationHeaders(null, true)
   );
-  const ttl = new Date(token.expires).getTime() - Date.now();
 
-  TokenCache.set(getKey(userUuid, type), token, { ttl });
   return token;
 }
