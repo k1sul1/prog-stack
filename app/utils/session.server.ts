@@ -1,5 +1,10 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
-import { createToken, Token, TokenType } from "~/models/token.server";
+import {
+  createToken,
+  deleteToken,
+  Token,
+  TokenType,
+} from "~/models/token.server";
 
 import type { User, UserWithToken } from "~/models/user.server";
 import { getUserByUUID } from "~/models/user.server";
@@ -32,12 +37,25 @@ export async function getUserUUID(
   return userId;
 }
 
-export async function getUser(request: Request) {
+export async function getUser(request: Request, withHasuraToken = true) {
   const userId = await getUserUUID(request);
+  const session = await getSession(request);
+
   if (userId === undefined) return null;
 
   const user = await getUserByUUID(userId);
-  if (user) return user;
+  if (user) {
+    const hasuraToken = session.has(USER_SESSION_HASURA_TOKEN)
+      ? session.get(USER_SESSION_HASURA_TOKEN)
+      : null;
+
+    const withToken: UserWithToken = {
+      hasuraToken,
+      ...user,
+    };
+
+    return withToken;
+  }
 
   throw await logout(request);
 }
@@ -107,6 +125,9 @@ export async function createUserSession({
 
 export async function logout(request: Request) {
   const session = await getSession(request);
+  const user = await requireUser(request);
+
+  await deleteToken(user.hasuraToken);
   return redirect("/", {
     headers: {
       "Set-Cookie": await sessionStorage.destroySession(session),

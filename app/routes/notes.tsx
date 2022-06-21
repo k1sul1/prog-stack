@@ -5,8 +5,8 @@ import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 import { requireUser } from "~/utils/session.server";
 import { useUser } from "~/utils/hooks";
 import { getNotesForUser } from "~/models/note.server";
-// import { CatchBoundary, ErrorBoundary } from "~/routes/notes/$noteId";
-// export { CatchBoundary, ErrorBoundary }; // Sharing is caring!
+import { CatchBoundary, ErrorBoundary } from "~/routes/notes/$noteId";
+export { CatchBoundary, ErrorBoundary }; // Sharing is caring!
 
 type LoaderData = {
   noteListItems: Awaited<ReturnType<typeof getNotesForUser>>;

@@ -1,6 +1,7 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
+import { useEffect } from "react";
 
 import type { Note } from "~/models/note.server";
 import { deleteNote } from "~/models/note.server";
@@ -53,6 +54,16 @@ export default function NoteDetailsPage() {
 
 export function ErrorBoundary({ error }: { error: Error }) {
   console.error(error);
+
+  // This logs the user out instead of locking them in a permanent error screen
+  // if something happens to their hasura token.
+  useEffect(() => {
+    if (
+      error.message.startsWith("Authentication hook unauthorized this request")
+    ) {
+      window.location.href = "/logout";
+    }
+  }, [error]);
 
   return <div>An unexpected error occurred: {error.message}</div>;
 }

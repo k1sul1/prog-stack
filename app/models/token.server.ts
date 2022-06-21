@@ -1,5 +1,5 @@
 import gqlReq, { getAuthenticationHeaders, gql } from "~/utils/gql.server";
-import { User } from "./user.server";
+import { User, UserWithToken } from "./user.server";
 import crypto from "crypto";
 
 export enum TokenType {
@@ -87,4 +87,27 @@ export async function createToken(
   );
 
   return token;
+}
+
+export async function deleteToken(token: string) {
+  const { delete_tokens: deletedTokens } = await gqlReq<{
+    delete_tokens: Token;
+  }>(
+    gql`
+      mutation deleteToken($token: String!) {
+        delete_tokens_by_pk(token: $token) {
+          token
+          type
+          expires
+          user
+        }
+      }
+    `,
+    {
+      token,
+    },
+    await getAuthenticationHeaders(null, true)
+  );
+
+  return deletedTokens;
 }
