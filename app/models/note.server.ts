@@ -1,4 +1,4 @@
-import type { User } from "./user.server";
+import type { UserWithToken } from "./user.server";
 import gqlReq, { getAuthenticationHeaders, gql } from "~/utils/gql.server";
 
 export type Note = {
@@ -10,7 +10,7 @@ export type Note = {
   user: string;
 };
 
-export async function getNote(uuid: Note["uuid"], user: User) {
+export async function getNote(uuid: Note["uuid"], user: UserWithToken) {
   const { notes } = await gqlReq<{ notes: Note[] }>(
     gql`
       query getNote($uuid: uuid, $user: uuid) {
@@ -31,7 +31,7 @@ export async function getNote(uuid: Note["uuid"], user: User) {
 
     // I've set permissions so that admins and owners can query other peoples notes.
     // Standard user with the role `user` can't.
-    getAuthenticationHeaders(user)
+    await getAuthenticationHeaders(user)
   );
 
   if (!notes.length) {
@@ -41,7 +41,7 @@ export async function getNote(uuid: Note["uuid"], user: User) {
   return notes[0];
 }
 
-export async function getNotesForUser(user: User) {
+export async function getNotesForUser(user: UserWithToken) {
   const { notes } = await gqlReq<{ notes: Note[] }>(
     gql`
       query getNotesForUser($user: uuid) {
@@ -56,7 +56,7 @@ export async function getNotesForUser(user: User) {
       }
     `,
     { user: user.uuid },
-    getAuthenticationHeaders(user)
+    await getAuthenticationHeaders(user)
   );
 
   return notes;
@@ -64,7 +64,7 @@ export async function getNotesForUser(user: User) {
 
 export async function createNote(
   { body, title }: Pick<Note, "body" | "title">,
-  user: User
+  user: UserWithToken
 ) {
   const { insert_notes_one: note } = await gqlReq<{ insert_notes_one: Note }>(
     gql`
@@ -86,13 +86,13 @@ export async function createNote(
         user: user.uuid,
       },
     },
-    getAuthenticationHeaders(user)
+    await getAuthenticationHeaders(user)
   );
 
   return note;
 }
 
-export async function deleteNote(uuid: string, user: User) {
+export async function deleteNote(uuid: string, user: UserWithToken) {
   const { delete_notes_by_pk: deletedNotes } = await gqlReq<{
     delete_notes_by_pk: Note;
   }>(
@@ -111,7 +111,7 @@ export async function deleteNote(uuid: string, user: User) {
     {
       uuid,
     },
-    getAuthenticationHeaders(user)
+    await getAuthenticationHeaders(user)
   );
 
   return deletedNotes;

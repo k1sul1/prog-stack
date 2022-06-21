@@ -1,0 +1,7 @@
+table:
+  schema: public
+  name: tokens
+object_relationships:
+  - name: userByUser
+    using:
+      foreign_key_constraint_on: user

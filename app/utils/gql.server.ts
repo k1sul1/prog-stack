@@ -1,7 +1,6 @@
 import type { ClientError, Variables, RequestDocument } from "graphql-request";
 import { GraphQLClient, gql } from "graphql-request";
-import type { User } from "~/models/user.server";
-import { UserRole } from "./user";
+import type { UserWithToken } from "~/models/user.server";
 export { gql };
 
 export const client = new GraphQLClient(process.env.HASURA_URL);
@@ -13,19 +12,20 @@ export const client = new GraphQLClient(process.env.HASURA_URL);
  * Sometimes you have a situation where you don't have an user to make the call with, that's why you have
  * the sudo param as an escape hatch.
  */
-export function getAuthenticationHeaders(
-  user: User | null,
+export async function getAuthenticationHeaders(
+  user: UserWithToken | null,
   sudo = false
-): Record<string, string> {
-  let headers: ReturnType<typeof getAuthenticationHeaders> = {};
+): Promise<Record<string, string>> {
+  let headers: Record<string, string> = {};
 
   if (user) {
     headers["x-hasura-user-id"] = user.uuid;
   }
 
-  // Using the admin secret prevents Hasura from calling the webhook unnecessarily.
-  if (sudo || (user && user.role === UserRole.admin)) {
+  if (sudo) {
     headers["x-hasura-admin-secret"] = process.env.HASURA_ADMIN_SECRET;
+  } else if (user) {
+    headers["Authorization"] = user.hasuraToken;
   }
 
   return headers;

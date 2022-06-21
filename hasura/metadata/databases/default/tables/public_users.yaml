@@ -9,6 +9,13 @@ array_relationships:
         table:
           schema: public
           name: notes
+  - name: tokens
+    using:
+      foreign_key_constraint_on:
+        column: user
+        table:
+          schema: public
+          name: tokens
 insert_permissions:
   - role: moderator
     permission:

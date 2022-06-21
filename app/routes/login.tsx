@@ -52,7 +52,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   return createUserSession({
     request,
-    userId: user.uuid,
+    userUuid: user.uuid,
     remember: remember === "on" ? true : false,
     redirectTo,
   });
