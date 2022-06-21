@@ -33,7 +33,7 @@ export async function getAllUsers() {
       }
     `,
     {},
-    getAuthenticationHeaders(null, true)
+    await getAuthenticationHeaders(null, true)
   );
 
   return users;
@@ -59,7 +59,7 @@ export async function getUserByUUID(uuid: User["uuid"]) {
       }
     `,
     { uuid },
-    getAuthenticationHeaders(null, true)
+    await getAuthenticationHeaders(null, true)
   );
 
   if (!users.length) {
@@ -89,7 +89,7 @@ export async function getUserByEmail(email: User["email"]) {
       }
     `,
     { email },
-    getAuthenticationHeaders(null, true)
+    await getAuthenticationHeaders(null, true)
   );
 
   if (!users.length) {
@@ -132,7 +132,7 @@ export async function createUser(
         passhash: hashedPassword,
       },
     },
-    getAuthenticationHeaders(null, true)
+    await getAuthenticationHeaders(null, true)
   );
 
   return user;
@@ -170,7 +170,7 @@ export async function deleteUser(user: User | User["email"]) {
     {
       email,
     },
-    getAuthenticationHeaders(null, true)
+    await getAuthenticationHeaders(null, true)
   );
 
   return deletedUsers[0];
@@ -201,7 +201,7 @@ export async function verifyLogin(email: User["email"], password: string) {
     {
       email,
     },
-    getAuthenticationHeaders(null, true)
+    await getAuthenticationHeaders(null, true)
   );
 
   if (!users.length) {

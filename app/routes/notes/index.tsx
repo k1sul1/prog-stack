@@ -1,5 +1,8 @@
 import { Link } from "@remix-run/react";
 
+// import { CatchBoundary, ErrorBoundary } from "~/routes/notes/$noteId";
+// export { CatchBoundary, ErrorBoundary }; // Sharing is caring!
+
 export default function NoteIndexPage() {
   return (
     <p>

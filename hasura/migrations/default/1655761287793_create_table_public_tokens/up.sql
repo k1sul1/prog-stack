@@ -1,0 +1,1 @@
+CREATE TABLE "public"."tokens" ("id" serial NOT NULL, "token" text NOT NULL, "type" integer NOT NULL, "expires" date NOT NULL, "user" uuid NOT NULL, PRIMARY KEY ("id") , FOREIGN KEY ("user") REFERENCES "public"."users"("uuid") ON UPDATE cascade ON DELETE cascade, UNIQUE ("token"));

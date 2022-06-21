@@ -31,7 +31,7 @@ export async function getNote(uuid: Note["uuid"], user: User) {
 
     // I've set permissions so that admins and owners can query other peoples notes.
     // Standard user with the role `user` can't.
-    getAuthenticationHeaders(user)
+    await getAuthenticationHeaders(user)
   );
 
   if (!notes.length) {
@@ -56,7 +56,7 @@ export async function getNotesForUser(user: User) {
       }
     `,
     { user: user.uuid },
-    getAuthenticationHeaders(user)
+    await getAuthenticationHeaders(user)
   );
 
   return notes;
@@ -86,7 +86,7 @@ export async function createNote(
         user: user.uuid,
       },
     },
-    getAuthenticationHeaders(user)
+    await getAuthenticationHeaders(user)
   );
 
   return note;
@@ -111,7 +111,7 @@ export async function deleteNote(uuid: string, user: User) {
     {
       uuid,
     },
-    getAuthenticationHeaders(user)
+    await getAuthenticationHeaders(user)
   );
 
   return deletedNotes;

@@ -28,12 +28,13 @@ insert_permissions:
         - uuid
   - role: user
     permission:
-      check: {}
-      set:
-        user: X-Hasura-User-Id
+      check:
+        user:
+          _eq: X-Hasura-User-Id
       columns:
         - body
         - title
+        - user
 select_permissions:
   - role: moderator
     permission:
@@ -95,8 +96,13 @@ update_permissions:
       columns:
         - body
         - title
-      filter: {}
-      check: {}
+        - user
+      filter:
+        user:
+          _eq: X-Hasura-User-Id
+      check:
+        user:
+          _eq: X-Hasura-User-Id
 delete_permissions:
   - role: moderator
     permission:
@@ -109,4 +115,6 @@ delete_permissions:
   - role: user
     permission:
       backend_only: false
-      filter: {}
+      filter:
+        user:
+          _eq: X-Hasura-User-Id
