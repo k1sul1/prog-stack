@@ -55,7 +55,7 @@ export async function getUserByEmail(email: User["email"]) {
 
 ## What's in the stack
 
-Everything that [the Blues stack](https://github.com/remix-run/blues-stack) had when this stack was forked from it on 2022-06-17, and a tad more.
+Almost everything that [the Blues stack](https://github.com/remix-run/blues-stack) had when this stack was forked from it on 2022-06-17, and a tad more. You know if the repository has been kept up to date with the upstream, if this repository is ahead of blues-stack. 
 
 - [Hasura](https://hasura.io/)
 - [Multi-region Fly app deployment](https://fly.io/docs/reference/scaling/) with [Docker](https://www.docker.com/)
@@ -72,6 +72,16 @@ Everything that [the Blues stack](https://github.com/remix-run/blues-stack) had 
 - Static Types with [TypeScript](https://typescriptlang.org)
 
 Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --template your/repo`! Make it your own.
+
+### What's missing from Blues?
+- I took out tiny-invariant, it's an useless dependency that makes your life harder than need be. 
+- Prisma, obviously.
+- Some tests didn't want to play along, so I commented them out and left fixing them as an exercise to the reader.
+
+## What's new? 
+- Simple but effective form validation cuts the loc count of actions drastically. Just call validateAndParseForm and forget about it.
+- TODO: Even better Hasura integration that I wrote into a sideproject of mine, that's using this stack as a template. Including but not limited to automatic token renewals and much better error resiliency.
+
 
 ## Development
 
