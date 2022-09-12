@@ -76,6 +76,12 @@ Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --
 ## Development
 
 - Install [Hasura CLI](https://hasura.io/docs/latest/graphql/core/hasura-cli/install-hasura-cli/). It's available on npm.
+- This step only applies if you've opted out of having the CLI install dependencies for you:
+
+   ```sh
+   npx remix init
+   ```
+
 
 - Start [Docker services](https://www.docker.com/get-started):
 
@@ -149,6 +155,8 @@ Prior to your first deployment, you'll need to do a few things:
   fly create remix-prog-stack
   fly create remix-prog-stack-staging
   ```
+  
+  > **Note:** Once you've successfully created an app, double-check the `fly.toml` file to ensure that the `app` key is the name of the production app you created. This Stack [automatically appends a unique suffix at init](https://github.com/remix-run/blues-stack/blob/4c2f1af416b539187beb8126dd16f6bc38f47639/remix.init/index.js#L29) which may not match the apps you created on Fly. You will likely see [404 errors in your Github Actions CI logs](https://community.fly.io/t/404-failure-with-deployment-with-remix-blues-stack/4526/3) if you have this mismatch.
 
 - Initialize Git.
 

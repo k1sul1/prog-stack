@@ -1,18 +1,13 @@
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 
-import type { Note } from "~/models/note.server";
 import { deleteNote } from "~/models/note.server";
 import { getNote } from "~/models/note.server";
 import { requireUser } from "~/utils/session.server";
 
-type LoaderData = {
-  note: Note;
-};
-
-export const loader: LoaderFunction = async ({ request, params }) => {
+export async function loader({ request, params }: LoaderArgs) {
   const user = await requireUser(request);
   const note = await getNote(params.noteId!, user);
 
@@ -20,20 +15,20 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw new Response("Not Found", { status: 404 });
   }
 
-  return json<LoaderData>({ note });
+  return json({ note });
 };
 
-export const action: ActionFunction = async ({ request, params }) => {
+export async function action({ request, params }: ActionArgs) {
   const user = await requireUser(request);
   const deleted = await deleteNote(params.noteId!, user);
-
+  
   console.log("Deleted note!", deleted);
 
   return redirect("/notes");
-};
+}
 
 export default function NoteDetailsPage() {
-  const data = useLoaderData() as LoaderData;
+  const data = useLoaderData<typeof loader>();
 
   return (
     <div>

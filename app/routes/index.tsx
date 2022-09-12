@@ -9,7 +9,15 @@ export default function Index() {
       <div className="relative sm:pb-16 sm:pt-8">
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="relative shadow-xl sm:overflow-hidden sm:rounded-2xl">
-            <div className="lg:pb-18 relative bg-gradient-to-t from-fuchsia-900 via-yellow-700 to-violet-500 px-4 pt-16 pb-8 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8 lg:pt-32">
+            <div className="absolute inset-0">
+              <img
+                className="h-full w-full object-cover"
+                src="https://user-images.githubusercontent.com/1500684/158276320-c46b661b-8eff-4a4d-82c6-cf296c987a12.jpg"
+                alt="BB King playing blues on his Les Paul guitar"
+              />
+              <div className="absolute inset-0 bg-[color:rgba(27,167,254,0.5)] mix-blend-multiply" />
+            </div>
+            <div className="relative px-4 pt-16 pb-8 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8 lg:pb-20 lg:pt-32">
               <h1 className="text-center text-6xl font-extrabold tracking-tight sm:text-8xl lg:text-9xl">
                 <span className="block uppercase text-pink-400 drop-shadow-md">
                   Prog Stack
@@ -36,7 +44,7 @@ export default function Index() {
                     </Link>
                     <Link
                       to="/login"
-                      className="flex items-center justify-center rounded-md bg-blue-500 px-4 py-3 font-medium text-white hover:bg-blue-600  "
+                      className="flex items-center justify-center rounded-md bg-blue-500 px-4 py-3 font-medium text-white hover:bg-blue-600"
                     >
                       Log In
                     </Link>
@@ -119,7 +127,7 @@ export default function Index() {
                 href={img.href}
                 className="flex h-16 w-32 justify-center p-1 grayscale transition hover:grayscale-0 focus:grayscale-0"
               >
-                <img alt={img.alt} src={img.src} />
+                <img alt={img.alt} src={img.src} className="object-contain" />
               </a>
             ))}
           </div>

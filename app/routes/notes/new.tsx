@@ -1,4 +1,4 @@
-import type { ActionFunction } from "@remix-run/node";
+import type { ActionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import * as React from "react";
@@ -10,14 +10,8 @@ import { inputValidators, validateAndParseForm } from "~/utils/validate";
 import { CatchBoundary, ErrorBoundary } from "~/routes/notes/$noteId";
 export { CatchBoundary, ErrorBoundary }; // Sharing is caring!
 
-type ActionData = {
-  errors?: {
-    title?: string;
-    body?: string;
-  };
-};
 
-export const action: ActionFunction = async ({ request }) => {
+export async function action({ request, params }: ActionArgs) {
   const user = await requireUser(request);
   const formData = await request.formData();
 
@@ -27,7 +21,7 @@ export const action: ActionFunction = async ({ request }) => {
   );
 
   if (errors) {
-    return json<ActionData>({ errors }, { status: 400 });
+    return json({ errors }, { status: 400 });
   }
 
   const { title, body } = entries;
@@ -44,7 +38,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function NewNotePage() {
-  const actionData = useActionData() as ActionData;
+  const actionData = useActionData<typeof action>();
   const titleRef = React.useRef<HTMLInputElement>(null);
   const bodyRef = React.useRef<HTMLTextAreaElement>(null);
 

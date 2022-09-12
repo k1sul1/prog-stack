@@ -1,8 +1,4 @@
-import type {
-  ActionFunction,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node";
+import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import * as React from "react";
@@ -14,20 +10,13 @@ import { safeRedirect } from "~/utils";
 import { inputValidators, validateAndParseForm } from "~/utils/validate";
 import { UserRole, UserStatus } from "~/utils/user";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderArgs) {
   const userId = await getUserUUID(request);
   if (userId) return redirect("/");
   return json({});
-};
-
-interface ActionData {
-  errors: {
-    email?: string;
-    password?: string;
-  };
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
   const { errors, entries } = validateAndParseForm(
     formData,
@@ -35,16 +24,22 @@ export const action: ActionFunction = async ({ request }) => {
   );
 
   if (errors) {
-    return json<ActionData>({ errors }, { status: 400 });
+    return json({ errors }, { status: 400 });
   }
 
   const { email, password, redirectTo: unsafeRedirect } = entries;
   const redirectTo = safeRedirect(unsafeRedirect, "/");
 
   const existingUser = await getUserByEmail(email as string);
+
   if (existingUser) {
-    return json<ActionData>(
-      { errors: { email: "A user already exists with this email" } },
+    return json(
+      {
+        errors: {
+          email: "A user already exists with this email",
+          password: null,
+        },
+      },
       { status: 400 }
     );
   }
@@ -62,7 +57,7 @@ export const action: ActionFunction = async ({ request }) => {
     remember: false,
     redirectTo,
   });
-};
+}
 
 export const meta: MetaFunction = () => {
   return {
@@ -73,7 +68,7 @@ export const meta: MetaFunction = () => {
 export default function Join() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") ?? undefined;
-  const actionData = useActionData() as ActionData;
+  const actionData = useActionData<typeof action>();
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
 

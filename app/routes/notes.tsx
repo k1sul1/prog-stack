@@ -1,4 +1,4 @@
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 
@@ -8,18 +8,16 @@ import { getNotesForUser } from "~/models/note.server";
 import { CatchBoundary, ErrorBoundary } from "~/routes/notes/$noteId";
 export { CatchBoundary, ErrorBoundary }; // Sharing is caring!
 
-type LoaderData = {
-  noteListItems: Awaited<ReturnType<typeof getNotesForUser>>;
-};
 
-export const loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderArgs) {
   const user = await requireUser(request);
   const noteListItems = await getNotesForUser(user);
-  return json<LoaderData>({ noteListItems });
+  
+  return json({ noteListItems });
 };
 
 export default function NotesPage() {
-  const data = useLoaderData() as LoaderData;
+  const data = useLoaderData<typeof loader>();
   const user = useUser();
 
   return (

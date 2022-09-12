@@ -1,8 +1,4 @@
-import type {
-  ActionFunction,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node";
+import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import * as React from "react";
@@ -12,20 +8,13 @@ import { verifyLogin } from "~/models/user.server";
 import { safeRedirect } from "~/utils";
 import { inputValidators, validateAndParseForm } from "~/utils/validate";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderArgs) {
   const userId = await getUserUUID(request);
   if (userId) return redirect("/");
   return json({});
-};
-
-interface ActionData {
-  errors?: {
-    email?: string;
-    password?: string;
-  };
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
   const { errors, entries } = validateAndParseForm(
     formData,
@@ -33,7 +22,7 @@ export const action: ActionFunction = async ({ request }) => {
   );
 
   if (errors) {
-    return json<ActionData>({ errors }, { status: 400 });
+    return json({ errors }, { status: 400 });
   }
 
   const { email, password, redirectTo: unsafeRedirect, remember } = entries;
@@ -42,8 +31,8 @@ export const action: ActionFunction = async ({ request }) => {
   const user = await verifyLogin(email as string, password as string);
 
   if (!user) {
-    return json<ActionData>(
-      { errors: { email: "Invalid email or password" } },
+    return json(
+      { errors: { email: "Invalid email or password", password: null } },
       { status: 400 }
     );
   }
@@ -56,7 +45,7 @@ export const action: ActionFunction = async ({ request }) => {
     remember: remember === "on" ? true : false,
     redirectTo,
   });
-};
+}
 
 export const meta: MetaFunction = () => {
   return {
@@ -67,7 +56,7 @@ export const meta: MetaFunction = () => {
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/notes";
-  const actionData = useActionData() as ActionData;
+  const actionData = useActionData<typeof action>();
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
 
