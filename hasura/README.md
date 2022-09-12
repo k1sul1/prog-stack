@@ -13,6 +13,13 @@ hasura metadata reload
 hasura seed apply
 ```
 
+## Linux support
+This works "out-of-the-box" on Arch Linux, probably on every other distribution too. 
+
+Only thing you have to change is docker-compose.yml.
+
+You'll have to change 3 lines manually. Terrifying, I know. To make it easier for you, I've marked the lines with a comment.
+
 Rest of this document is about getting it running on Fly and your Remix application talking to it.
 
 ## Setting it up
