@@ -2,7 +2,7 @@
 
 Read this first for insight on how things work with Hasura if you've never used it before: https://hasura.io/blog/hasura-authentication-explained/.
 
-Let's start out by laying out what we have. For the actual Remix application, we have  username-password authentication, the password hash is generated with bcrypt. Simple stuff. **However**, Remix talks to Hasura via loaders and actions, and Hasura **authorizes** the request by making a callback to the /hasura-auth webhook.
+Let's start out by laying out what we have. For the actual Remix application, we have  username-password authentication, the password hash is generated with bcrypt. Simple stuff. **However**, Remix talks to Hasura via loaders and actions, and Hasura **authorizes** the request by making a callback to the /hasura-auth webhook. Most of the time. There's also "sudo" mode that bypasses the webhook by using the admin secret. As with sudo, you should avoid using it whenever you can, but you can't create tokens into the token table without root permissions...
 
 One could argue that a JWT would be more suitable, but I want to have the ability to talk to Hasura from the client if need be. I would argue back that you should use JWT when you're also integrating with something like Auth0, just like the document above said; assuming you read it. 
 
@@ -37,3 +37,4 @@ export async function loader({ request }: LoaderArgs) {
 
 The key is to catch AuthError, redirect to login, and then back to where the user was. All other errors? Rethrow them or handle them as you want. The error boundaries (that you should definitely create or use!) will handle them.
 
+Behind the scenes there's an absolute monster that does things like abusing the error handling to create a new token before the existing one expires. It has some goto-vibes in it, but it works and it's relatively fast, considering the complexity of it. My aim with this is that you'd never have to touch it but only time will tell.
