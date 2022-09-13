@@ -218,12 +218,6 @@ const main = async ({ isTypeScript, packageManager, rootDirectory }) => {
     APP_NAME
   );
 
-  const newPackageJson =
-    JSON.stringify(
-      ({ ...JSON.parse(packageJson), name: APP_NAME }),
-      null,
-      2
-    ) + "\n";
   const newDockerfile = pm.lockfile
     ? dockerfile.replace(
         new RegExp(escapeRegExp("ADD package.json"), "g"),
