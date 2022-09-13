@@ -10,7 +10,7 @@ _psst, if you open this README after running the command above, you get commands
 
 [Motivation behind the stack](https://www.youtube.com/watch?v=ZNIV2H-jmfM)
 
-I like Hasura more than I like Prisma. There, I said it. While Remix has killed almost every client side api call, I like having a GraphQL API and the option to talk to it from the browser.
+I like Hasura more than I like Prisma. There, I said it. While Remix has killed almost every client side api call, I like having a GraphQL API and the option to talk to it from the browser. And everything else that Hasura offers, including... migrations that work. Dysfunctional migrations are what drove me away from Prisma.
 
 This stack **does not** talk to Hasura from the browser, but you could make it do that if you wanted to, pretty easily.
 
@@ -86,6 +86,7 @@ Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --
 ## Development
 
 - Install [Hasura CLI](https://hasura.io/docs/latest/graphql/core/hasura-cli/install-hasura-cli/). It's available on npm.
+- 
 - This step only applies if you've opted out of having the CLI install dependencies for you:
 
    ```sh

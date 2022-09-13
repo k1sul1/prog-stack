@@ -8,7 +8,7 @@ export { gql };
 export const client = new GraphQLClient(process.env.HASURA_URL);
 
 /**
- * Helper for adding authentication to your GraphQL calls. This way we get row level permissions
+ * Helper for adding authorization to your GraphQL calls. This way we get row level permissions
  * that change depending on user role.
  *
  * Sometimes you have a situation where you don't have an user to make the call with, that's why you have
