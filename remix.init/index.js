@@ -267,11 +267,12 @@ const main = async ({ isTypeScript, packageManager, rootDirectory }) => {
     `
 Setup is almost complete. Follow these steps to finish initialization:
 
-- Install hasura cli if you didn't already
+- Install hasura cli if you didn't already. 
+- Open at least 3 terminal windows. 1 for Hasura and PostgreSQL docker logs, 1 for Remix compiler, and 1 for hasura console.
 
 - Start the database and Hasura:
   cd hasura
-  docker-compose up -d
+  docker-compose up
   # wait for it to start
   hasura metadata apply
   hasura migrate apply
