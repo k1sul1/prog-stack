@@ -100,6 +100,8 @@ If you'd prefer not to use Docker locally, you can just point the local applicat
 
 You should really at least glance at [./hasura/README.md](hasura/README.md) before proceeding.
 
+And take a look at the config file you're going to be running, just for your own sake. If you're running Linux, you have to make a few minor changes, that I've already made for you. Just add and remove some # characters from the docker-compose.yml.
+
 ```sh
 cd hasura
 docker compose up # it's going to take a while to get started.

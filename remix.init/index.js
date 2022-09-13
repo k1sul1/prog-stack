@@ -220,7 +220,7 @@ const main = async ({ isTypeScript, packageManager, rootDirectory }) => {
 
   const newPackageJson =
     JSON.stringify(
-      sort({ ...JSON.parse(packageJson), name: APP_NAME }),
+      ({ ...JSON.parse(packageJson), name: APP_NAME }),
       null,
       2
     ) + "\n";
