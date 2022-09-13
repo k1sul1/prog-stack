@@ -132,6 +132,8 @@ You can also talk to the production instance with `hasura console` using --endpo
 
 This starts your app in development mode, rebuilding assets on file changes. Open it, and try creating an account, or logging in with `rachel@remix.run` using the password `racheliscool`.
 
+If that doesn't work and you see something like `An unexpected error occurred: webhook authentication request failed` instead, ensure that you've configured docker correctly. I might accidentally change the default config options to Linux when working on the repo (did that twice already), as I work on Linux. 
+
 ### Relevant code:
 
 This is a pretty simple note-taking app, but it's a good example of how you can build a full stack app with Hasura and Remix. The main functionality is creating users, logging in and out, and creating and deleting notes.

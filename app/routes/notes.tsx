@@ -3,7 +3,6 @@ import { json } from "@remix-run/node";
 import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 
 import {
-  requireUser,
   authenticate,
   AuthError,
   redirectToLoginAndBackHere,
@@ -16,10 +15,11 @@ export { CatchBoundary, ErrorBoundary }; // Sharing is caring!
 
 export async function loader({ request }: LoaderArgs) {
   try {
+    const headers = new Headers();
     const user = await authenticate(request);
     const noteListItems = await getNotesForUser(user);
 
-    return json({ noteListItems });
+    return json({ noteListItems }, { headers });
   } catch (e) {
     if (e instanceof AuthError) {
       return redirectToLoginAndBackHere(request);

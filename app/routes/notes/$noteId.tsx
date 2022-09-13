@@ -5,27 +5,50 @@ import { useEffect } from "react";
 
 import { deleteNote } from "~/models/note.server";
 import { getNote } from "~/models/note.server";
-import { requireUser } from "~/utils/session.server";
+import {
+  authenticate,
+  AuthError,
+  redirectToLoginAndBackHere,
+} from "~/utils/session.server";
 
 export async function loader({ request, params }: LoaderArgs) {
-  const user = await requireUser(request);
-  const note = await getNote(params.noteId!, user);
+  try {
+    const headers = new Headers();
+    const user = await authenticate(request);
+    const note = await getNote(params.noteId!, user);
 
-  if (!note) {
-    throw new Response("Not Found", { status: 404 });
+    if (!note) {
+      throw new Response("Not Found", { status: 404 });
+    }
+
+    return json({ note }, { headers });
+  } catch (e) {
+    if (e instanceof AuthError) {
+      return redirectToLoginAndBackHere(request);
+    }
+
+    throw e;
   }
-
-  return json({ note });
-};
+}
 
 export async function action({ request, params }: ActionArgs) {
-  const user = await requireUser(request);
-  const deleted = await deleteNote(params.noteId!, user);
-  
-  console.log("Deleted note!", deleted);
+  try {
+    const headers = new Headers();
+    const user = await authenticate(request);
+    const deleted = await deleteNote(params.noteId!, user);
 
-  return redirect("/notes");
-}
+    console.log("Deleted note!", deleted);
+
+    return redirect("/notes", { headers });
+  } catch (e) {
+    if (e instanceof AuthError) {
+      return redirectToLoginAndBackHere(request);
+    }
+
+    throw e;
+  }
+};
+
 
 export default function NoteDetailsPage() {
   const data = useLoaderData<typeof loader>();

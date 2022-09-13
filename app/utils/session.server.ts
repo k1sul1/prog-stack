@@ -248,27 +248,6 @@ export async function requireUserUuid(
   return userId;
 }
 
-export async function requireUser(request: Request, withHasuraToken = true) {
-  const userUuid = await requireUserUuid(request);
-  const user = await getUserByUUID(userUuid);
-  const session = await getSession(request);
-
-  if (user) {
-    const hasuraToken = session.has(USER_SESSION_HASURA_TOKEN)
-      ? session.get(USER_SESSION_HASURA_TOKEN)
-      : null;
-
-    const withToken: UserWithToken = {
-      hasuraToken,
-      ...user,
-    };
-
-    return withToken;
-  }
-
-  throw await logout(request);
-}
-
 export async function createUserSession({
   request,
   userUuid,

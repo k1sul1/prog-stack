@@ -4,38 +4,51 @@ import { Form, useActionData } from "@remix-run/react";
 import * as React from "react";
 
 import { createNote } from "~/models/note.server";
-import { requireUser } from "~/utils/session.server";
 
 import { inputValidators, validateAndParseForm } from "~/utils/validate";
 import { CatchBoundary, ErrorBoundary } from "~/routes/notes/$noteId";
 
 export { CatchBoundary, ErrorBoundary }; // Sharing is caring!
 
+import {
+  authenticate,
+  AuthError,
+  redirectToLoginAndBackHere,
+} from "~/utils/session.server";
 
 export async function action({ request, params }: ActionArgs) {
-  const user = await requireUser(request);
-  const formData = await request.formData();
+  try {
+    const headers = new Headers();
+    const user = await authenticate(request);
+    const formData = await request.formData();
 
-  const { errors, entries } = validateAndParseForm(
-    formData,
-    inputValidators.newNote
-  );
+    const { errors, entries } = validateAndParseForm(
+      formData,
+      inputValidators.newNote
+    );
 
-  if (errors) {
-    return json({ errors }, { status: 400 });
+    if (errors) {
+      return json({ errors }, { status: 400 });
+    }
+
+    const { title, body } = entries;
+
+    const note = await createNote(
+      {
+        title: title as string,
+        body: body as string,
+      },
+      user
+    );
+
+    return redirect(`/notes/${note.uuid}`, { headers });
+  } catch (e) {
+    if (e instanceof AuthError) {
+      return redirectToLoginAndBackHere(request);
+    }
+
+    throw e;
   }
-
-  const { title, body } = entries;
-
-  const note = await createNote(
-    {
-      title: title as string,
-      body: body as string,
-    },
-    user
-  );
-
-  return redirect(`/notes/${note.uuid}`);
 };
 
 export default function NewNotePage() {

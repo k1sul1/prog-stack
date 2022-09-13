@@ -17,10 +17,13 @@ Here's an example loader that ensures that the current user has permissions to g
 ```ts
 export async function loader({ request }: LoaderArgs) {
   try {
+     // authenticate needs to manipulate request headers,
+     // so it can update the session cookie before it expires.
+    const headers = new Headers();
     const user = await authenticate(request);
     const noteListItems = await getNotesForUser(user);
 
-    return json({ noteListItems });
+    return json({ noteListItems }, { headers });
   } catch (e) {
     if (e instanceof AuthError) {
       return redirectToLoginAndBackHere(request);
