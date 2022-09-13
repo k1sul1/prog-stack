@@ -8,6 +8,7 @@ import { requireUser } from "~/utils/session.server";
 
 import { inputValidators, validateAndParseForm } from "~/utils/validate";
 import { CatchBoundary, ErrorBoundary } from "~/routes/notes/$noteId";
+
 export { CatchBoundary, ErrorBoundary }; // Sharing is caring!
 
 

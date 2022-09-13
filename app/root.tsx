@@ -11,7 +11,7 @@ import {
 
 import tailwindStylesheetUrl from "./generatedcss/tailwind.css";
 
-import { getUser } from "./utils/session.server";
+import { getCurrentUserFromDb } from "./utils/session.server";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
@@ -24,11 +24,11 @@ export const meta: MetaFunction = () => ({
 });
 
 type LoaderData = {
-  user: Awaited<ReturnType<typeof getUser>>;
+  user: Awaited<ReturnType<typeof getCurrentUserFromDb>>;
 };
 
 export async function loader({ request }: LoaderArgs) {
-  const user = await getUser(request);
+  const user = await getCurrentUserFromDb(request);
 
   return json<LoaderData>({
     user,

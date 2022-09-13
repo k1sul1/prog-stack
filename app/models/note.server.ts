@@ -1,6 +1,9 @@
 import type { UserWithToken } from "./user.server";
 import gqlReq, { getAuthenticationHeaders, gql } from "~/utils/gql.server";
 
+// Alternative way of saving queries instead of inlining them here:
+import getNoteQuery from "~/gql/getNote.gql";
+
 export type Note = {
   uuid: string;
   title: string;
@@ -12,21 +15,7 @@ export type Note = {
 
 export async function getNote(uuid: Note["uuid"], user: UserWithToken) {
   const { notes } = await gqlReq<{ notes: Note[] }>(
-    gql`
-      query getNote($uuid: uuid, $user: uuid) {
-        # You can hard-prevent querying other peoples notes by adding the user to the query.
-        # That's totally unnecessary if you use Hasura permissions!
-        # notes(where: { uuid: { _eq: $uuid }, user: { _eq: $user } }) {
-        notes(where: { uuid: { _eq: $uuid } }) {
-          uuid
-          title
-          body
-          createdAt
-          updatedAt
-          user
-        }
-      }
-    `,
+    getNoteQuery,
     { uuid },
 
     // I've set permissions so that admins and owners can query other peoples notes.

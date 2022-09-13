@@ -3,7 +3,11 @@ import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import * as React from "react";
 
-import { getUserUUID, createUserSession } from "~/utils/session.server";
+import {
+  getUserUuidFromSession,
+  createUserSession,
+  getSession,
+} from "~/utils/session.server";
 
 import { createUser, getUserByEmail } from "~/models/user.server";
 import { safeRedirect } from "~/utils";
@@ -11,7 +15,9 @@ import { inputValidators, validateAndParseForm } from "~/utils/validate";
 import { UserRole, UserStatus } from "~/utils/user";
 
 export async function loader({ request }: LoaderArgs) {
-  const userId = await getUserUUID(request);
+  const session = await getSession(request);
+  const userId = await getUserUuidFromSession(session);
+
   if (userId) return redirect("/");
   return json({});
 }

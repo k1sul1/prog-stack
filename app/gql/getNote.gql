@@ -1,0 +1,13 @@
+query getNote($uuid: uuid, $user: uuid) {
+  # You can hard-prevent querying other peoples notes by adding the user to the query.
+  # That's totally unnecessary if you use Hasura permissions!
+  # notes(where: { uuid: { _eq: $uuid }, user: { _eq: $user } }) {
+  notes(where: { uuid: { _eq: $uuid } }) {
+    uuid
+    title
+    body
+    createdAt
+    updatedAt
+    user
+  }
+}

@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import gqlReq, { getAuthenticationHeaders, gql } from "~/utils/gql.server";
 import type { UserRole, UserStatus } from "~/utils/user";
+import type { Token } from "./token.server";
 
 export type User = {
   uuid: string;
@@ -12,7 +13,7 @@ export type User = {
   meta: JSON | null;
 };
 export type UserWithPassword = User & { passhash: string };
-export type UserWithToken = User & { hasuraToken: string };
+export type UserWithToken = User & { hasuraToken: Token };
 
 /**
  * Get ALL users.

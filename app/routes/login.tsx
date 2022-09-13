@@ -3,13 +3,18 @@ import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import * as React from "react";
 
-import { createUserSession, getUserUUID } from "~/utils/session.server";
+import {
+  createUserSession,
+  getSession,
+  getUserUuidFromSession,
+} from "~/utils/session.server";
 import { verifyLogin } from "~/models/user.server";
 import { safeRedirect } from "~/utils";
 import { inputValidators, validateAndParseForm } from "~/utils/validate";
 
 export async function loader({ request }: LoaderArgs) {
-  const userId = await getUserUUID(request);
+  const session = await getSession(request);
+  const userId = await getUserUuidFromSession(session);
   if (userId) return redirect("/");
   return json({});
 }
@@ -91,6 +96,7 @@ export default function LoginPage() {
                 aria-invalid={actionData?.errors?.email ? true : undefined}
                 aria-describedby="email-error"
                 className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+                defaultValue="rachel@remix.run"
               />
               {actionData?.errors?.email && (
                 <div className="pt-1 text-red-700" id="email-error">
@@ -117,6 +123,7 @@ export default function LoginPage() {
                 aria-invalid={actionData?.errors?.password ? true : undefined}
                 aria-describedby="password-error"
                 className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+                defaultValue="racheliscool"
               />
               {actionData?.errors?.password && (
                 <div className="pt-1 text-red-700" id="password-error">

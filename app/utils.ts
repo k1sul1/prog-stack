@@ -43,3 +43,7 @@ export function log(...args: any): void {
     console.trace(...args);
   }
 }
+
+export function currentUrlPathFromRequest(request: Request) {
+  return new URL(request.url).pathname;
+}

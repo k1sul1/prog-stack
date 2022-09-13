@@ -1,6 +1,8 @@
 import type { ClientError, Variables, RequestDocument } from "graphql-request";
 import { GraphQLClient, gql } from "graphql-request";
 import type { UserWithToken } from "~/models/user.server";
+import { AuthError } from "./session.server";
+
 export { gql };
 
 export const client = new GraphQLClient(process.env.HASURA_URL);
@@ -25,7 +27,7 @@ export async function getAuthenticationHeaders(
   if (sudo) {
     headers["x-hasura-admin-secret"] = process.env.HASURA_ADMIN_SECRET;
   } else if (user) {
-    headers["Authorization"] = user.hasuraToken;
+    headers["Authorization"] = user.hasuraToken.token;
   }
 
   return headers;
@@ -40,12 +42,16 @@ export default async function gqlReq<T = RequestDocument, Y = Variables>(
     const response = await client.request<T, Y>(query, variables, optHeaders);
 
     return response;
-  } catch (e) {
-    const clientError = e as ClientError;
+  } catch (clientError) {
+    const e = clientError as ClientError;
 
-    if (clientError.response?.status === 404) {
-      console.error(clientError);
+    if (e.response?.status === 404) {
+      console.error(e);
       throw new Error("Tried to request an endpoint that does not exist");
+    }
+
+    if (e.message.includes("Authentication hook unauthorized")) {
+      throw new AuthError("Token is unauthorized. Login again.");
     }
 
     throw clientError;

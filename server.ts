@@ -16,6 +16,10 @@ declare global {
   }
 }
 
+// It's important that node timezone is the same as the db timezone. Otherwise timestamps will differ.
+// And problems will follow.
+process.env.TZ = "UTC";
+
 const app = express();
 const defSecret = "keyboardcat";
 

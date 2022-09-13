@@ -55,7 +55,7 @@ export async function getUserByEmail(email: User["email"]) {
 
 ## What's in the stack
 
-Almost everything that [the Blues stack](https://github.com/remix-run/blues-stack) had when this stack was forked from it on 2022-06-17, and a tad more. You know if the repository has been kept up to date with the upstream, if this repository is ahead of blues-stack. 
+Almost everything that [the Blues stack](https://github.com/remix-run/blues-stack) had when this stack was forked from it on 2022-06-17, and a tad more. You know if the repository has been kept up to date with the upstream, if this repository is ahead of blues-stack. Changes to blues are usually pretty minor so you can just manually copypaste them if I haven't had the time of synchronizing.
 
 - [Hasura](https://hasura.io/)
 - [Multi-region Fly app deployment](https://fly.io/docs/reference/scaling/) with [Docker](https://www.docker.com/)
@@ -76,11 +76,11 @@ Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --
 ### What's missing from Blues?
 - I took out tiny-invariant, it's an useless dependency that makes your life harder than need be. 
 - Prisma, obviously.
-- Some tests didn't want to play along, so I commented them out and left fixing them as an exercise to the reader.
+- Some tests didn't want to play along, so I commented them out and left fixing them as an exercise to the reader. I'll be scrapping them all in every project, so I'm not too fond on the idea of spending more time on something that I'll remove.
 
-## What's new? 
+## How about that other stuff that you added? 
 - Simple but effective form validation cuts the loc count of actions drastically. Just call validateAndParseForm and forget about it.
-- TODO: Even better Hasura integration that I wrote into a sideproject of mine, that's using this stack as a template. Including but not limited to automatic token renewals and much better error resiliency.
+- [Authentication & Authorization](./auth-explained.md)
 
 
 ## Development

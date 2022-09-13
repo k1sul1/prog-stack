@@ -2,19 +2,32 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 
-import { requireUser } from "~/utils/session.server";
+import {
+  requireUser,
+  authenticate,
+  AuthError,
+  redirectToLoginAndBackHere,
+} from "~/utils/session.server";
 import { useUser } from "~/utils/hooks";
 import { getNotesForUser } from "~/models/note.server";
 import { CatchBoundary, ErrorBoundary } from "~/routes/notes/$noteId";
+
 export { CatchBoundary, ErrorBoundary }; // Sharing is caring!
 
-
 export async function loader({ request }: LoaderArgs) {
-  const user = await requireUser(request);
-  const noteListItems = await getNotesForUser(user);
-  
-  return json({ noteListItems });
-};
+  try {
+    const user = await authenticate(request);
+    const noteListItems = await getNotesForUser(user);
+
+    return json({ noteListItems });
+  } catch (e) {
+    if (e instanceof AuthError) {
+      return redirectToLoginAndBackHere(request);
+    }
+
+    throw e;
+  }
+}
 
 export default function NotesPage() {
   const data = useLoaderData<typeof loader>();
