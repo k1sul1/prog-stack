@@ -51,7 +51,7 @@ export async function getUserByEmail(email: User["email"]) {
 
   return users[0];
 }
-
+```
 
 ## What's in the stack
 

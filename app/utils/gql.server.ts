@@ -5,7 +5,7 @@ import { AuthError } from "./session.server";
 
 export { gql };
 
-export const client = new GraphQLClient(process.env.HASURA_URL!);
+export const client = new GraphQLClient(process.env.HASURA_URL);
 
 /**
  * Helper for adding authorization to your GraphQL calls. This way we get row level permissions
@@ -25,7 +25,7 @@ export async function getAuthenticationHeaders(
   }
 
   if (sudo) {
-    headers["x-hasura-admin-secret"] = process.env.HASURA_ADMIN_SECRET!;
+    headers["x-hasura-admin-secret"] = process.env.HASURA_ADMIN_SECRET;
   } else if (user) {
     headers["Authorization"] = user.hasuraToken.token;
   }
